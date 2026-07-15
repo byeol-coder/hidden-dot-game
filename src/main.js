@@ -54,11 +54,11 @@ import { ACTION } from "./input/actions.js";
   }[currentLang];
 
   const STAGES = [
-    { cols: 2, rows: 2, ko: ["첫 번째 빛", "반딧불 풀밭", "네 개의 돌 가운데 숨어 있는 반딧불 빛을 찾아보세요."], en: ["First light", "Firefly Meadow", "Find the firefly light hidden among four stones."], storyKo: "반딧불들이 다시 길을 밝히기 시작했어요.", storyEn: "The fireflies are lighting the path again." },
-    { cols: 3, rows: 2, ko: ["두 번째 빛", "달빛 버섯길", "여섯 개의 버섯 돌 사이에서 달빛 점을 찾아보세요."], en: ["Second light", "Moon Mushroom Path", "Find the moonlight dot among six mushroom stones."], storyKo: "잠든 버섯 등불이 하나씩 켜졌어요.", storyEn: "The sleeping mushroom lamps are glowing again." },
-    { cols: 3, rows: 3, ko: ["세 번째 빛", "별씨앗 정원", "아홉 개의 씨앗 중 특별한 별씨앗을 찾아보세요."], en: ["Third light", "Star Seed Garden", "Find the special star seed among nine seeds."], storyKo: "정원에서 작은 별꽃이 피어났어요.", storyEn: "Tiny star flowers are blooming in the garden." },
-    { cols: 4, rows: 3, ko: ["네 번째 빛", "고요한 연못", "열두 개의 물결 돌 중 반짝이는 물방울을 찾아보세요."], en: ["Fourth light", "Quiet Pond", "Find the sparkling drop among twelve ripple stones."], storyKo: "연못에 달빛이 다시 비치기 시작했어요.", storyEn: "Moonlight is shining on the pond again." },
-    { cols: 5, rows: 4, ko: ["마지막 빛", "별빛 나무 언덕", "스무 개의 돌 가운데 마지막 별빛 점을 찾아보세요."], en: ["Final light", "Starlight Tree Hill", "Find the final starlight dot among twenty stones."], storyKo: "마지막 빛이 별빛 나무를 향해 날아가요.", storyEn: "The final light is flying back to the starlight tree." }
+    { cols: 2, rows: 2, art: "assets/stages/stage-01-firefly-meadow.webp", ko: ["첫 번째 빛", "반딧불 풀밭", "네 개의 돌 가운데 숨어 있는 반딧불 빛을 찾아보세요."], en: ["First light", "Firefly Meadow", "Find the firefly light hidden among four stones."], storyKo: "반딧불들이 다시 길을 밝히기 시작했어요.", storyEn: "The fireflies are lighting the path again." },
+    { cols: 3, rows: 2, art: "assets/stages/stage-02-moon-mushroom-path.webp", ko: ["두 번째 빛", "달빛 버섯길", "여섯 개의 버섯 돌 사이에서 달빛 점을 찾아보세요."], en: ["Second light", "Moon Mushroom Path", "Find the moonlight dot among six mushroom stones."], storyKo: "잠든 버섯 등불이 하나씩 켜졌어요.", storyEn: "The sleeping mushroom lamps are glowing again." },
+    { cols: 3, rows: 3, art: "assets/stages/stage-03-star-seed-garden.webp", ko: ["세 번째 빛", "별씨앗 정원", "아홉 개의 씨앗 중 특별한 별씨앗을 찾아보세요."], en: ["Third light", "Star Seed Garden", "Find the special star seed among nine seeds."], storyKo: "정원에서 작은 별꽃이 피어났어요.", storyEn: "Tiny star flowers are blooming in the garden." },
+    { cols: 4, rows: 3, art: "assets/stages/stage-04-quiet-pond.webp", ko: ["네 번째 빛", "고요한 연못", "열두 개의 물결 돌 중 반짝이는 물방울을 찾아보세요."], en: ["Fourth light", "Quiet Pond", "Find the sparkling drop among twelve ripple stones."], storyKo: "연못에 달빛이 다시 비치기 시작했어요.", storyEn: "Moonlight is shining on the pond again." },
+    { cols: 5, rows: 4, art: "assets/stages/stage-05-starlight-tree-hill.webp", ko: ["마지막 빛", "별빛 나무 언덕", "스무 개의 돌 가운데 마지막 별빛 점을 찾아보세요."], en: ["Final light", "Starlight Tree Hill", "Find the final starlight dot among twenty stones."], storyKo: "마지막 빛이 별빛 나무를 향해 날아가요.", storyEn: "The final light is flying back to the starlight tree." }
   ];
 
   const TUTORIAL = [
@@ -238,6 +238,7 @@ import { ACTION } from "./input/actions.js";
     $("#stageKicker").textContent = text[0];
     $("#stageTitle").textContent = text[1];
     $("#stageDesc").textContent = text[2];
+    $("#boardShell").style.setProperty("--stage-art", `url(\"${stage.art}\")`);
     $("#instruction").textContent = currentLang === "en"
       ? "An ordinary stone has one center dot. The hidden light has five dots in a cross."
       : "보통 돌은 가운데 점 하나, 숨은 빛은 십자 모양 다섯 점입니다.";

@@ -159,7 +159,8 @@
     .board-shell {
       position: relative; border: 1px solid rgba(191,226,255,.3); border-radius: 28px;
       padding: clamp(20px, 4vw, 38px); background:
-        radial-gradient(circle at center, rgba(54,96,142,.32), transparent 70%),
+        linear-gradient(rgba(3, 14, 33, .68), rgba(3, 14, 33, .76)),
+        var(--stage-art) center / cover no-repeat,
         linear-gradient(145deg, #0d213d, #071427);
       min-height: 420px; display: grid; place-items: center; overflow: hidden;
     }
@@ -231,7 +232,7 @@
     .tutorial-dots { display: flex; gap: 7px; margin-top: 16px; }
     .tutorial-dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.2); }
     .tutorial-dot.on { background: var(--gold); box-shadow: 0 0 12px rgba(255,215,106,.7); }
-    .complete-visual { font-size: 72px; text-align: center; margin: 10px 0 18px; filter: drop-shadow(0 0 25px rgba(255,215,106,.4)); }
+    .result-art { display: block; width: 100%; max-height: 235px; object-fit: cover; border: 1px solid rgba(255, 224, 136, .38); border-radius: 18px; margin: 0 0 22px; box-shadow: 0 15px 38px rgba(0, 0, 0, .35); }
 
     .embed .topbar .brand-sub, .embed #exitBtn .exit-label { display: none; }
     .embed .app-shell { width: 100%; max-width: 1180px; padding-top: 10px; }

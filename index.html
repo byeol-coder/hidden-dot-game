@@ -113,7 +113,7 @@
             <div class="progress-stars" id="progressStars" aria-label="모은 빛 0개"></div>
           </div>
           <div class="instruction" id="instruction">보통 돌은 가운데 점 하나, 숨은 빛은 십자 모양 다섯 점입니다.</div>
-          <div class="board-shell">
+          <div class="board-shell" id="boardShell">
             <div id="searchBoard" class="search-board" role="grid" aria-label="숨은 점 찾기 촉각 보드"></div>
           </div>
           <p class="board-help" id="boardHelp">화살표로 선택 위치를 옮기고 Enter로 확인하세요. Space를 누르면 현재 위치를 들을 수 있어요.</p>
@@ -182,7 +182,7 @@
 
 <dialog id="stageDialog" aria-labelledby="stageDialogTitle">
   <div class="dialog-body">
-    <div class="complete-visual" aria-hidden="true">✨</div>
+    <img class="result-art" src="assets/results/stage-clear-light-found.webp" alt="" aria-hidden="true" />
     <div class="dialog-step" id="stageDialogKicker">빛 점을 찾았어요</div>
     <h2 class="dialog-title" id="stageDialogTitle">반딧불 풀밭이 환해졌어요!</h2>
     <p class="dialog-desc" id="stageDialogDesc">첫 번째 빛을 별빛 나무에 돌려보냈어요.</p>
@@ -195,7 +195,7 @@
 
 <dialog id="completeDialog" aria-labelledby="completeTitle">
   <div class="dialog-body">
-    <div class="complete-visual" aria-hidden="true">🌟</div>
+    <img class="result-art" src="assets/results/game-complete-starlight-tree.webp" alt="" aria-hidden="true" />
     <div class="dialog-step">모든 빛을 찾았어요</div>
     <h2 class="dialog-title" id="completeTitle">별빛 나무가 다시 깨어났어요!</h2>
     <p class="dialog-desc" id="completeDesc">도티와 함께 다섯 개의 숨은 점을 모두 찾았어요. 천천히 만지고, 위치를 기억하고, 끝까지 확인한 멋진 탐험이었어요.</p>
