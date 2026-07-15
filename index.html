@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#081631" />
   <meta name="description" content="손끝으로 특별한 빛 점을 찾는 아동용 촉각 탐색 게임" />
+  <meta property="og:image" content="./assets/card-thumbnail-600x800.jpg" />
   <title>숨은 점 찾기 · Dot Games</title>
   <!-- 음성 모듈. 임베드(embed=1) 시에는 호스트의 공용 TW_TTS를 우선 사용하고,
        단독 배포(GitHub Pages 등)에서는 동봉된 TW_TTS 호환 tts.js가 음성을 제공합니다.
        게임 코드 자체에는 별도 speechSynthesis TTS 엔진을 넣지 않습니다. -->
   <script src="./tts.js"></script>
+  <link rel="preload" as="image" href="./assets/hero-banner-2560x900.jpg" fetchpriority="high" />
   <link rel="stylesheet" href="./styles/game.css" />
+  <link rel="stylesheet" href="./styles/hero-refresh.css" />
 </head>
 <body>
 <a class="skip-link" href="#main">게임 내용으로 건너뛰기</a>
@@ -31,14 +34,14 @@
   </header>
 
   <main id="main" tabindex="-1">
-    <section id="homeScreen" class="screen active" aria-labelledby="homeTitle">
+    <section id="homeScreen" class="screen active" aria-labelledby="homeTitle" aria-describedby="homeLead homeStory">
       <div class="hero">
         <div class="hero-copy">
           <div class="eyebrow" id="homeEyebrow">아동용 촉각 탐색 게임</div>
           <h1 id="homeTitle">숨은 점<br>찾기</h1>
           <p class="hero-lead" id="homeLead">손끝으로 다른 모양의 빛 점을 찾아, 잠든 별빛 나무를 깨워주세요.</p>
           <p class="story" id="homeStory">밤바람이 불자 별빛 나무의 빛 다섯 개가 숲속 돌 사이에 숨어버렸어요. 작은 안내 친구 도티와 함께 점들을 천천히 만져보고, 특별한 빛 모양을 찾으면 확인해 주세요.</p>
-          <div class="hero-actions">
+          <div class="hero-actions" aria-label="게임 시작 방법">
             <button class="btn primary" id="tutorialBtn" type="button">처음부터 배우기</button>
             <button class="btn cyan" id="quickStartBtn" type="button">바로 시작</button>
           </div>

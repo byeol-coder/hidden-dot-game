@@ -1,0 +1,269 @@
+/*
+ * Cinematic intro overlay
+ *
+ * The artwork remains text-free. Game title, description, metadata and actions
+ * are rendered as accessible HTML above the image so they can be localized,
+ * focused and announced independently.
+ */
+
+#homeScreen .hero {
+  isolation: isolate;
+  min-height: clamp(560px, 72vh, 720px);
+  display: flex;
+  align-items: center;
+  padding: clamp(34px, 6vw, 78px);
+  background-color: #041126;
+  background-image: url("../assets/hero-banner-2560x900.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  border-color: rgba(178, 225, 255, .32);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .48);
+}
+
+/* Left-side readability layer for the app-rendered title and controls. */
+#homeScreen .hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg,
+      rgba(2, 10, 25, .98) 0%,
+      rgba(3, 14, 33, .94) 24%,
+      rgba(4, 17, 38, .82) 45%,
+      rgba(4, 17, 38, .34) 67%,
+      rgba(4, 17, 38, .08) 100%),
+    linear-gradient(180deg,
+      rgba(2, 8, 20, .2) 0%,
+      transparent 46%,
+      rgba(2, 8, 20, .76) 100%);
+}
+
+#homeScreen .hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  height: 34%;
+  pointer-events: none;
+  opacity: 1;
+  background: linear-gradient(180deg, transparent, rgba(2, 9, 22, .86));
+}
+
+#homeScreen .hero-copy {
+  z-index: 2;
+  width: min(660px, 62%);
+  padding: clamp(22px, 3.4vw, 36px);
+  border: 1px solid rgba(211, 239, 255, .18);
+  border-radius: 26px;
+  background: linear-gradient(145deg, rgba(5, 18, 40, .78), rgba(5, 16, 35, .48));
+  box-shadow: 0 22px 65px rgba(0, 0, 0, .28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* The cinematic artwork already contains Dotty and the tree. Hide the old
+   inline illustration so the character is not duplicated. */
+#homeScreen .hero-art {
+  display: none !important;
+}
+
+#homeScreen .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid rgba(103, 232, 249, .42);
+  border-radius: 999px;
+  background: rgba(3, 23, 44, .74);
+  color: #baf8ff;
+  box-shadow: 0 0 24px rgba(56, 210, 245, .12);
+  letter-spacing: .12em;
+}
+
+#homeScreen .hero h1 {
+  max-width: 9ch;
+  margin: 20px 0 18px;
+  font-size: clamp(54px, 7.4vw, 92px);
+  line-height: .93;
+  letter-spacing: -.075em;
+  text-wrap: balance;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, .72);
+}
+
+#homeScreen .hero-lead {
+  max-width: 590px;
+  margin-bottom: 14px;
+  color: #fff;
+  font-size: clamp(19px, 2vw, 25px);
+  line-height: 1.5;
+  font-weight: 820;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .8);
+}
+
+#homeScreen .story {
+  max-width: 590px;
+  margin-bottom: 0;
+  color: #d7e5f3;
+  font-size: 15px;
+  line-height: 1.75;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .8);
+}
+
+#homeScreen .hero-actions {
+  gap: 12px;
+  margin: 28px 0 20px;
+}
+
+#homeScreen .hero-actions .btn {
+  min-height: 58px;
+  padding: 14px 22px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 950;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .3);
+}
+
+#homeScreen #tutorialBtn::before {
+  content: "✦";
+  font-size: 18px;
+}
+
+#homeScreen #quickStartBtn::before {
+  content: "▶";
+  font-size: 15px;
+}
+
+#homeScreen .hero-actions .btn:hover {
+  transform: translateY(-2px) scale(1.015);
+}
+
+#homeScreen .meta-row {
+  gap: 8px;
+}
+
+#homeScreen .chip {
+  border-color: rgba(211, 239, 255, .23);
+  background: rgba(3, 15, 33, .7);
+  box-shadow: 0 7px 20px rgba(0, 0, 0, .15);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Keep the top controls visually related to the cinematic intro without
+   changing their IDs or interaction behavior. */
+#homeScreen.active ~ * .topbar,
+.topbar {
+  background: rgba(3, 13, 31, .82);
+  border-color: rgba(190, 229, 255, .25);
+}
+
+.embed #homeScreen .hero {
+  min-height: min(700px, calc(100vh - 96px));
+}
+
+@media (max-width: 860px) {
+  #homeScreen .hero {
+    min-height: 650px;
+    align-items: flex-end;
+    padding: clamp(24px, 5vw, 42px);
+    background-position: 66% center;
+  }
+
+  #homeScreen .hero::before {
+    background:
+      linear-gradient(180deg,
+        rgba(2, 10, 24, .1) 0%,
+        rgba(2, 10, 24, .24) 32%,
+        rgba(2, 10, 24, .92) 68%,
+        rgba(2, 10, 24, .99) 100%),
+      linear-gradient(90deg, rgba(2, 10, 24, .82), rgba(2, 10, 24, .14));
+  }
+
+  #homeScreen .hero-copy {
+    width: 100%;
+    max-width: 680px;
+    background: linear-gradient(145deg, rgba(4, 15, 34, .88), rgba(4, 15, 34, .68));
+  }
+
+  #homeScreen .hero h1 {
+    max-width: none;
+  }
+}
+
+@media (max-width: 600px) {
+  #homeScreen .hero {
+    min-height: 660px;
+    padding: 18px 14px;
+    border-radius: 22px;
+    background-position: 70% center;
+  }
+
+  #homeScreen .hero-copy {
+    padding: 22px 18px;
+    border-radius: 20px;
+  }
+
+  #homeScreen .hero h1 {
+    margin-top: 16px;
+    font-size: clamp(46px, 16vw, 64px);
+  }
+
+  #homeScreen .story {
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  #homeScreen .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  #homeScreen .hero-actions .btn {
+    width: 100%;
+    min-height: 56px;
+  }
+
+  #homeScreen .meta-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #homeScreen .chip {
+    justify-content: center;
+    min-width: 0;
+    text-align: center;
+  }
+}
+
+@media (min-width: 861px) and (max-height: 760px) {
+  #homeScreen .hero {
+    min-height: 570px;
+    padding-top: 34px;
+    padding-bottom: 34px;
+  }
+
+  #homeScreen .hero-copy {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  #homeScreen .hero h1 {
+    font-size: clamp(52px, 7vw, 76px);
+  }
+
+  #homeScreen .story {
+    line-height: 1.58;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  #homeScreen .hero-copy,
+  #homeScreen .chip {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(3, 14, 32, .94);
+  }
+}
