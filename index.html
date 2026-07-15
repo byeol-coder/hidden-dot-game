@@ -4,13 +4,27 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#081631" />
-  <meta name="description" content="손끝으로 특별한 빛 점을 찾는 아동용 촉각 탐색 게임" />
+  <meta name="description" content="손끝으로 특별한 빛 점을 찾는, 시각장애 아동을 위한 60×40 닷패드 촉각 탐색 게임. TTS 음성·촉각·키보드만으로 완주할 수 있습니다." />
+  <title>숨은 점 찾기 · Find the Hidden Dot · Dot Games</title>
+
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Dot Games" />
+  <meta property="og:title" content="숨은 점 찾기 · Find the Hidden Dot" />
+  <meta property="og:description" content="손끝으로 다른 촉각 패턴을 찾아 별빛 나무의 다섯 빛을 깨우는, 시각장애 아동을 위한 촉각 탐색 게임." />
   <meta property="og:image" content="./assets/card-thumbnail-600x800.jpg" />
-  <title>숨은 점 찾기 · Dot Games</title>
+  <meta property="og:locale" content="ko_KR" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="숨은 점 찾기 · Find the Hidden Dot" />
+  <meta name="twitter:description" content="TTS 음성·촉각 핀·키보드만으로 처음부터 끝까지 플레이하는 60×40 닷패드 접근성 게임." />
+  <meta name="twitter:image" content="./assets/card-thumbnail-600x800.jpg" />
+
   <!-- 음성 모듈. 임베드(embed=1) 시에는 호스트의 공용 TW_TTS를 우선 사용하고,
        단독 배포(GitHub Pages 등)에서는 동봉된 TW_TTS 호환 tts.js가 음성을 제공합니다.
-       게임 코드 자체에는 별도 speechSynthesis TTS 엔진을 넣지 않습니다. -->
-  <script src="./tts.js"></script>
+       게임 코드 자체에는 별도 speechSynthesis TTS 엔진을 넣지 않습니다.
+       defer: HTML 파싱을 막지 않으면서 module인 main.js보다 먼저 실행됩니다. -->
+  <script defer src="./tts.js"></script>
   <link rel="preload" as="image" href="./assets/hero-banner-2560x900.jpg" fetchpriority="high" />
   <link rel="stylesheet" href="./styles/game.css" />
   <link rel="stylesheet" href="./styles/hero-refresh.css" />
