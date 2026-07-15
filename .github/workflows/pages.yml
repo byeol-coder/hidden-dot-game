@@ -24,6 +24,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Add official DotPad Web SDK 3.0.0
+        run: |
+          mkdir -p dotpad-sdk
+          curl --fail --silent --show-error --location \
+            "https://raw.githubusercontent.com/dotincorp/dotpad-sdk-guide/9544ebbbae27ce24db0eda425aac3936fd6af2f4/Web/3.0.0/DotPadSDK-3.0.0.js" \
+            --output dotpad-sdk/DotPadSDK-3.0.0.js
+          test -s dotpad-sdk/DotPadSDK-3.0.0.js
+          node --check dotpad-sdk/DotPadSDK-3.0.0.js
+
       - name: Syntax check
         run: node --check src/main.js && node --check tts.js
 
