@@ -15,6 +15,17 @@
   "entry": "index.html?embed=1&preview=0",
   "heroImage": "assets/hero-banner-2560x900.jpg",
   "thumbnail": "assets/card-thumbnail-600x800.jpg",
+  "stageImages": [
+    "assets/stages/stage-01-firefly-meadow.webp",
+    "assets/stages/stage-02-moon-mushroom-path.webp",
+    "assets/stages/stage-03-star-seed-garden.webp",
+    "assets/stages/stage-04-quiet-pond.webp",
+    "assets/stages/stage-05-starlight-tree-hill.webp"
+  ],
+  "resultImages": {
+    "stageClear": "assets/results/stage-clear-light-found.webp",
+    "gameComplete": "assets/results/game-complete-starlight-tree.webp"
+  },
   "introductionImage": "assets/game-introduction-web.jpg",
   "tts": "TW_TTS",
   "dotPadSdk": "dotpad-sdk/DotPadSDK-3.0.0.js",
