@@ -102,53 +102,69 @@
     </section>
 
     <section id="gameScreen" class="screen" aria-labelledby="stageTitle">
-      <div class="game-layout">
-        <section class="game-main">
-          <div class="stage-head">
-            <div>
-              <div class="stage-kicker" id="stageKicker">첫 번째 빛</div>
-              <h2 class="stage-title" id="stageTitle">반딧불 풀밭</h2>
-              <p class="stage-desc" id="stageDesc">네 개의 돌 가운데 숨어 있는 빛 점을 찾아보세요.</p>
-            </div>
-            <div class="progress-stars" id="progressStars" aria-label="모은 빛 0개"></div>
+      <div class="stage-scene">
+        <img id="stageArt" class="stage-bg" alt="" aria-hidden="true" decoding="async" />
+        <div class="stage-scrim" aria-hidden="true"></div>
+
+        <div class="hud hud-top">
+          <div class="hud-objective">
+            <div class="stage-kicker" id="stageKicker">첫 번째 빛</div>
+            <h2 class="stage-title" id="stageTitle">반딧불 풀밭</h2>
+            <p class="stage-desc" id="stageDesc">네 개의 돌 가운데 숨어 있는 빛 점을 찾아보세요.</p>
           </div>
+          <div class="hud-side">
+            <div class="progress-panel">
+              <div class="progress-stars" id="progressStars" aria-label="모은 빛 0개"></div>
+              <div class="progress-track" aria-hidden="true"><span id="progressMeter"></span></div>
+            </div>
+            <div class="hud-tools">
+              <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog">
+                <span class="icon-btn-glyph" aria-hidden="true">?</span><span class="icon-btn-label">도움말</span>
+              </button>
+              <span id="technicalCard">
+                <button class="icon-btn" id="tactileBtn" type="button" aria-haspopup="dialog">
+                  <span class="icon-btn-glyph" aria-hidden="true">⠿</span><span class="icon-btn-label">촉각판</span>
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="board-stage">
           <div class="instruction" id="instruction">보통 돌은 가운데 점 하나, 숨은 빛은 십자 모양 다섯 점입니다.</div>
           <div class="board-shell" id="boardShell">
             <div id="searchBoard" class="search-board" role="grid" aria-label="숨은 점 찾기 촉각 보드"></div>
           </div>
           <p class="board-help" id="boardHelp">화살표로 선택 위치를 옮기고 Enter로 확인하세요. Space를 누르면 현재 위치를 들을 수 있어요.</p>
-          <div class="game-actions">
-            <button class="btn" id="checkBtn" type="button">✓ 이곳 확인</button>
-            <button class="btn" id="readBtn" type="button">🔊 현재 위치</button>
-            <button class="btn" id="hintBtn" type="button">💡 힌트</button>
-            <button class="btn" id="restartBtn" type="button">↻ 다시 시작</button>
-          </div>
-        </section>
+        </div>
 
-        <aside class="side" aria-label="게임 정보와 조작 안내">
-          <section class="side-card">
-            <h3>도티의 안내</h3>
-            <div id="statusMessage" class="status-message" role="status" aria-live="polite" aria-atomic="true">게임을 시작할 준비가 됐어요.</div>
-            <div class="meter" aria-hidden="true"><span id="progressMeter"></span></div>
-          </section>
-          <section class="side-card">
-            <h3>조작 방법</h3>
-            <div class="control-list">
-              <div class="control-row"><kbd>← ↑ ↓ →</kbd><span>선택 위치 이동</span></div>
-              <div class="control-row"><kbd>Enter · F3</kbd><span>현재 위치 확인</span></div>
-              <div class="control-row"><kbd>Space · F4</kbd><span>현재 위치 듣기</span></div>
-              <div class="control-row"><kbd>Pan All</kbd><span>전체 상황 듣기</span></div>
-              <div class="control-row"><kbd>F1 · F2</kbd><span>위·아래 이동</span></div>
+        <div class="hud hud-bottom">
+          <div class="dotty-guide">
+            <div class="dotty-avatar" aria-hidden="true">
+              <svg viewBox="0 0 120 120" role="img">
+                <defs>
+                  <radialGradient id="dottyBody" cx="35%" cy="28%" r="72%"><stop offset="0" stop-color="#d7fbff"/><stop offset=".4" stop-color="#78eaff"/><stop offset="1" stop-color="#19a8de"/></radialGradient>
+                </defs>
+                <circle cx="60" cy="63" r="42" fill="url(#dottyBody)" stroke="#bdf8ff" stroke-width="3"/>
+                <ellipse cx="46" cy="58" rx="7" ry="10" fill="#0a315f"/><ellipse cx="74" cy="58" rx="7" ry="10" fill="#0a315f"/>
+                <circle cx="44" cy="54" r="2.4" fill="#fff"/><circle cx="72" cy="54" r="2.4" fill="#fff"/>
+                <path d="M50 74 Q60 82 70 74" fill="none" stroke="#0a315f" stroke-width="3.4" stroke-linecap="round"/>
+                <path d="M60 20 C60 12 68 9 72 15" fill="none" stroke="#8ceeff" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="74" cy="14" r="5" fill="#ffd45e"/>
+              </svg>
             </div>
-          </section>
-          <section class="side-card" id="technicalCard">
-            <h3>60×40 닷패드 프레임</h3>
-            <div class="tech-preview">
-              <canvas id="dotpadCanvas" width="600" height="400" aria-label="닷패드 60×40 출력 미리보기"></canvas>
-              <div class="preview-meta"><span id="hexMeta">300 bytes · 600 hex</span><span id="padStatus">시뮬레이터</span></div>
+            <div class="dotty-speech">
+              <span class="dotty-name">도티</span>
+              <div id="statusMessage" class="status-message" role="status" aria-live="polite" aria-atomic="true">게임을 시작할 준비가 됐어요.</div>
             </div>
-          </section>
-        </aside>
+          </div>
+          <div class="action-bar" aria-label="게임 행동">
+            <button class="game-btn primary" id="checkBtn" type="button"><span class="gb-icon" aria-hidden="true">✓</span><span class="gb-text">이곳 확인</span><kbd class="gb-key">Enter</kbd></button>
+            <button class="game-btn" id="readBtn" type="button"><span class="gb-icon" aria-hidden="true">🔊</span><span class="gb-text">현재 위치</span><kbd class="gb-key">Space</kbd></button>
+            <button class="game-btn" id="hintBtn" type="button"><span class="gb-icon" aria-hidden="true">💡</span><span class="gb-text">힌트</span><kbd class="gb-key">H</kbd></button>
+            <button class="game-btn" id="restartBtn" type="button"><span class="gb-icon" aria-hidden="true">↻</span><span class="gb-text">다시 시작</span><kbd class="gb-key">R</kbd></button>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -202,6 +218,41 @@
     <div class="dialog-actions">
       <button class="btn" id="completeHomeBtn" type="button">처음 화면</button>
       <button class="btn primary" id="playAgainBtn" type="button">한 번 더 놀기</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="helpDialog" class="drawer" aria-labelledby="helpTitle">
+  <div class="drawer-body">
+    <div class="drawer-head">
+      <div>
+        <div class="dialog-step" id="helpKicker">도움말</div>
+        <h2 class="dialog-title" id="helpTitle">조작 방법</h2>
+      </div>
+      <button class="icon-btn ghost" id="closeHelpBtn" type="button" aria-label="도움말 닫기"><span aria-hidden="true">✕</span></button>
+    </div>
+    <p class="drawer-lead" id="helpLead">방향키와 기능키만으로 손끝 탐색을 그대로 따라 할 수 있어요.</p>
+    <table class="control-table">
+      <thead><tr><th id="helpColAction">동작</th><th id="helpColKeyboard">키보드</th><th id="helpColDotpad">DotPad</th></tr></thead>
+      <tbody id="helpTableBody"></tbody>
+    </table>
+    <p class="drawer-note" id="helpNote">닷패드가 없어도 화면과 음성만으로 처음부터 끝까지 플레이할 수 있어요.</p>
+  </div>
+</dialog>
+
+<dialog id="tactileDialog" aria-labelledby="tactileTitle">
+  <div class="dialog-body">
+    <div class="dialog-top">
+      <div>
+        <div class="dialog-step" id="tactileKicker">60 × 40 촉각 출력</div>
+        <h2 class="dialog-title" id="tactileTitle">촉각판 미리보기</h2>
+      </div>
+      <button class="icon-btn ghost" id="closeTactileBtn" type="button" aria-label="촉각판 닫기"><span aria-hidden="true">✕</span></button>
+    </div>
+    <p class="dialog-desc" id="tactileDesc">지금 닷패드에 출력되는 60×40 점 패턴이에요. 밝은 점이 위로 올라온 핀이에요.</p>
+    <div class="tech-preview">
+      <canvas id="dotpadCanvas" width="600" height="400" aria-label="닷패드 60×40 출력 미리보기"></canvas>
+      <div class="preview-meta"><span id="hexMeta">300 bytes · 600 hex</span><span id="padStatus">시뮬레이터</span></div>
     </div>
   </div>
 </dialog>

@@ -185,6 +185,7 @@ import { ACTION } from "./input/actions.js";
     state.screen = name;
     $("#homeScreen").classList.toggle("active", name === "home");
     $("#gameScreen").classList.toggle("active", name === "game");
+    document.body.classList.toggle("in-game", name === "game");
     requestAnimationFrame(() => {
       $("#main").focus();
       notifyResize();
@@ -238,6 +239,10 @@ import { ACTION } from "./input/actions.js";
     $("#stageKicker").textContent = text[0];
     $("#stageTitle").textContent = text[1];
     $("#stageDesc").textContent = text[2];
+    // Use a real <img> for the full-scene background so the path resolves
+    // against the document (not styles/game.css). Keep the CSS var in sync for
+    // any legacy styling that still references it.
+    $("#stageArt").src = stage.art;
     $("#boardShell").style.setProperty("--stage-art", `url(\"${stage.art}\")`);
     $("#instruction").textContent = currentLang === "en"
       ? "An ordinary stone has one center dot. The hidden light has five dots in a cross."
@@ -462,6 +467,48 @@ import { ACTION } from "./input/actions.js";
     if (state.tutorialIndex > 0) { state.tutorialIndex -= 1; renderTutorial(); speak(tutorialText(TUTORIAL[state.tutorialIndex], "audio")); }
   }
 
+  // ---- On-demand help drawer + tactile overlay -----------------------------
+  const HELP_ROWS = [
+    { ko: ["위치 이동", "← ↑ ↓ →", "Pan L/R · F1 · F2"], en: ["Move selection", "← ↑ ↓ →", "Pan L/R · F1 · F2"] },
+    { ko: ["위치 확인", "Enter", "F3"], en: ["Check position", "Enter", "F3"] },
+    { ko: ["현재 위치 듣기", "Space", "F4"], en: ["Hear position", "Space", "F4"] },
+    { ko: ["전체 상황 듣기", "—", "Pan All"], en: ["Hear overview", "—", "Pan All"] },
+    { ko: ["힌트", "H", "—"], en: ["Hint", "H", "—"] },
+    { ko: ["단계 다시 시작", "R", "LPF1"], en: ["Restart stage", "R", "LPF1"] }
+  ];
+
+  function renderHelp() {
+    const body = $("#helpTableBody");
+    body.innerHTML = "";
+    for (const row of HELP_ROWS) {
+      const cells = currentLang === "en" ? row.en : row.ko;
+      const tr = document.createElement("tr");
+      const th = document.createElement("th");
+      th.scope = "row";
+      th.textContent = cells[0];
+      tr.appendChild(th);
+      for (let i = 1; i < cells.length; i++) {
+        const td = document.createElement("td");
+        td.innerHTML = cells[i] === "—" ? "<span class=\"help-none\">—</span>" : `<kbd>${cells[i]}</kbd>`;
+        tr.appendChild(td);
+      }
+      body.appendChild(tr);
+    }
+  }
+
+  function openHelp() {
+    renderHelp();
+    $("#helpDialog").showModal();
+    $("#closeHelpBtn").focus();
+  }
+
+  function openTactile() {
+    if (previewOff) return; // host requested no on-screen tactile preview
+    renderTechnicalPreview();
+    $("#tactileDialog").showModal();
+    $("#closeTactileBtn").focus();
+  }
+
   // ---- 60×40 tactile frame (reusable module) -------------------------------
   function buildFrame(showCursor = true) {
     return buildHiddenDotFrame({
@@ -625,7 +672,14 @@ import { ACTION } from "./input/actions.js";
   }
 
   function handleKeyboard(event) {
-    if (state.screen !== "game" || $("#tutorialDialog").open || $("#stageDialog").open || $("#completeDialog").open) return;
+    if (state.screen !== "game" || $("#tutorialDialog").open || $("#stageDialog").open || $("#completeDialog").open || $("#helpDialog").open || $("#tactileDialog").open) return;
+    // Let Enter/Space activate a focused HUD/action control normally instead of
+    // being captured as check/read. The play surface (#main and the .spot cells)
+    // is excluded, so arrow/Enter/Space/F-key play controls are unchanged.
+    if (event.key === "Enter" || event.key === " ") {
+      const target = event.target;
+      if (target instanceof HTMLElement && target.closest("button:not(.spot), a[href], [role='button']:not(.spot)")) return;
+    }
     let handled = true;
     switch (event.key) {
       case "ArrowLeft": moveCursor(-1, 0); break;
@@ -666,6 +720,10 @@ import { ACTION } from "./input/actions.js";
   $("#readBtn").addEventListener("click", () => readCurrent(true));
   $("#hintBtn").addEventListener("click", () => giveHint(true));
   $("#restartBtn").addEventListener("click", restartStage);
+  $("#helpBtn").addEventListener("click", openHelp);
+  $("#closeHelpBtn").addEventListener("click", () => $("#helpDialog").close());
+  $("#tactileBtn").addEventListener("click", openTactile);
+  $("#closeTactileBtn").addEventListener("click", () => $("#tactileDialog").close());
   $("#tutorialNextBtn").addEventListener("click", tutorialNext);
   $("#tutorialPrevBtn").addEventListener("click", tutorialPrev);
   $("#tutorialReplayBtn").addEventListener("click", () => speak(tutorialText(TUTORIAL[state.tutorialIndex], "audio")));
@@ -701,10 +759,26 @@ import { ACTION } from "./input/actions.js";
     $("#tutorialBtn").textContent = "Learn from the beginning";
     $("#quickStartBtn").textContent = "Quick start";
     $("#boardHelp").textContent = "Move with the arrow keys and press Enter to check. Press Space to hear the current position.";
-    $("#checkBtn").textContent = "✓ Check this spot";
-    $("#readBtn").textContent = "🔊 Current position";
-    $("#hintBtn").textContent = "💡 Hint";
-    $("#restartBtn").textContent = "↻ Restart";
+    $("#checkBtn .gb-text").textContent = "Check spot";
+    $("#readBtn .gb-text").textContent = "Position";
+    $("#hintBtn .gb-text").textContent = "Hint";
+    $("#restartBtn .gb-text").textContent = "Restart";
+    $("#helpBtn .icon-btn-label").textContent = "Controls";
+    $("#helpBtn").setAttribute("aria-label", "Controls");
+    $("#tactileBtn .icon-btn-label").textContent = "Tactile";
+    $("#tactileBtn").setAttribute("aria-label", "Tactile preview");
+    $("#helpKicker").textContent = "Help";
+    $("#helpTitle").textContent = "How to play";
+    $("#helpLead").textContent = "Arrow keys and function keys mirror the tactile search exactly.";
+    $("#helpColAction").textContent = "Action";
+    $("#helpColKeyboard").textContent = "Keyboard";
+    $("#helpColDotpad").textContent = "DotPad";
+    $("#helpNote").textContent = "You can finish the whole game with the screen and voice alone, even without a DotPad.";
+    $("#closeHelpBtn").setAttribute("aria-label", "Close controls");
+    $("#tactileKicker").textContent = "60 × 40 tactile output";
+    $("#tactileTitle").textContent = "Tactile preview";
+    $("#tactileDesc").textContent = "This is the 60 × 40 dot pattern sent to the DotPad. Bright dots are raised pins.";
+    $("#closeTactileBtn").setAttribute("aria-label", "Close tactile preview");
   }
 
   updateConnectionUI();
