@@ -261,8 +261,9 @@ import { ACTION } from "./input/actions.js";
   function renderBoard() {
     const stage = STAGES[state.stageIndex];
     const board = $("#searchBoard");
-    board.style.gridTemplateColumns = `repeat(${stage.cols}, auto)`;
-    board.style.gridTemplateRows = `repeat(${stage.rows}, auto)`;
+    board.style.gridTemplateColumns = `repeat(${stage.cols}, minmax(0, 1fr))`;
+    board.style.gridTemplateRows = `repeat(${stage.rows}, minmax(0, 1fr))`;
+    board.style.setProperty("--board-ratio", `${stage.cols} / ${stage.rows}`);
     board.innerHTML = "";
     const total = stage.cols * stage.rows;
     for (let index = 0; index < total; index++) {
