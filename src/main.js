@@ -117,6 +117,7 @@ import { ACTION } from "./input/actions.js";
     tutorialIndex: 0,
     soundOn: true,
     connected: false,
+    connecting: false,
     sdk: null,
     scanner: null,
     keyCodes: null,
@@ -620,6 +621,7 @@ import { ACTION } from "./input/actions.js";
   }
 
   async function connectDotPad() {
+    if (state.connecting) return; // a request/pairing dialog is already in flight
     if (state.connected) {
       try { state.sdk?.disconnect(); } catch (_) {}
       state.connected = false; updateConnectionUI();
@@ -628,10 +630,15 @@ import { ACTION } from "./input/actions.js";
     if (!navigator.bluetooth || !window.isSecureContext) {
       setStatus(COPY.connectionFail, "error"); speak(COPY.connectionFail); return;
     }
-    const loaded = await loadSDK();
-    if (!loaded) { setStatus(COPY.sdkMissing, "error"); speak(COPY.sdkMissing); return; }
-    setStatus(COPY.connectionWait); speak(COPY.connectionWait);
+    state.connecting = true;
+    const connectBtn = $("#connectBtn");
+    connectBtn.classList.add("is-loading");
+    connectBtn.setAttribute("aria-busy", "true");
+    connectBtn.disabled = true;
     try {
+      const loaded = await loadSDK();
+      if (!loaded) { setStatus(COPY.sdkMissing, "error"); speak(COPY.sdkMissing); return; }
+      setStatus(COPY.connectionWait); speak(COPY.connectionWait);
       let device = null;
       try {
         device = await navigator.bluetooth.requestDevice({
@@ -646,6 +653,11 @@ import { ACTION } from "./input/actions.js";
     } catch (error) {
       console.error("[DotPad connect]", error);
       setStatus(COPY.connectionFail, "error"); speak(COPY.connectionFail);
+    } finally {
+      state.connecting = false;
+      connectBtn.classList.remove("is-loading");
+      connectBtn.removeAttribute("aria-busy");
+      connectBtn.disabled = false;
     }
   }
 

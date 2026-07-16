@@ -89,6 +89,13 @@
     .btn.ghost { background: transparent; }
     .btn.small { min-height: 42px; padding: 9px 13px; font-size: 13px; }
     .btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+    .btn.is-loading { position: relative; color: transparent !important; pointer-events: none; }
+    .btn.is-loading .connection-dot, .btn.is-loading .label { opacity: 0; }
+    .btn.is-loading::after {
+      content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%;
+      border: 2.5px solid rgba(255,255,255,.35); border-top-color: #fff; animation: btnspin .7s linear infinite;
+    }
+    @keyframes btnspin { to { transform: rotate(360deg); } }
     .connection-dot { width: 9px; height: 9px; border-radius: 50%; background: #8190a8; box-shadow: 0 0 0 3px rgba(129,144,168,.15); }
     .connected .connection-dot { background: var(--green); box-shadow: 0 0 0 4px rgba(134,239,172,.15), 0 0 14px rgba(134,239,172,.45); }
 
