@@ -54,12 +54,14 @@ import { ACTION } from "./input/actions.js";
   }[currentLang];
 
   const STAGES = [
-    { cols: 2, rows: 2, art: "assets/stages/stage-01-firefly-meadow.webp", ko: ["첫 번째 빛", "반딧불 풀밭", "네 개의 돌 가운데 숨어 있는 반딧불 빛을 찾아보세요."], en: ["First light", "Firefly Meadow", "Find the firefly light hidden among four stones."], storyKo: "반딧불들이 다시 길을 밝히기 시작했어요.", storyEn: "The fireflies are lighting the path again." },
-    { cols: 3, rows: 2, art: "assets/stages/stage-02-moon-mushroom-path.webp", ko: ["두 번째 빛", "달빛 버섯길", "여섯 개의 버섯 돌 사이에서 달빛 점을 찾아보세요."], en: ["Second light", "Moon Mushroom Path", "Find the moonlight dot among six mushroom stones."], storyKo: "잠든 버섯 등불이 하나씩 켜졌어요.", storyEn: "The sleeping mushroom lamps are glowing again." },
-    { cols: 3, rows: 3, art: "assets/stages/stage-03-star-seed-garden.webp", ko: ["세 번째 빛", "별씨앗 정원", "아홉 개의 씨앗 중 특별한 별씨앗을 찾아보세요."], en: ["Third light", "Star Seed Garden", "Find the special star seed among nine seeds."], storyKo: "정원에서 작은 별꽃이 피어났어요.", storyEn: "Tiny star flowers are blooming in the garden." },
-    { cols: 4, rows: 3, art: "assets/stages/stage-04-quiet-pond.webp", ko: ["네 번째 빛", "고요한 연못", "열두 개의 물결 돌 중 반짝이는 물방울을 찾아보세요."], en: ["Fourth light", "Quiet Pond", "Find the sparkling drop among twelve ripple stones."], storyKo: "연못에 달빛이 다시 비치기 시작했어요.", storyEn: "Moonlight is shining on the pond again." },
-    { cols: 5, rows: 4, art: "assets/stages/stage-05-starlight-tree-hill.webp", ko: ["마지막 빛", "별빛 나무 언덕", "스무 개의 돌 가운데 마지막 별빛 점을 찾아보세요."], en: ["Final light", "Starlight Tree Hill", "Find the final starlight dot among twenty stones."], storyKo: "마지막 빛이 별빛 나무를 향해 날아가요.", storyEn: "The final light is flying back to the starlight tree." }
+    { slug: "firefly-meadow", cols: 2, rows: 2, art: "assets/stages/stage-01-firefly-meadow.webp", ko: ["첫 번째 빛", "반딧불 풀밭", "네 개의 돌 가운데 숨어 있는 반딧불 빛을 찾아보세요."], en: ["First light", "Firefly Meadow", "Find the firefly light hidden among four stones."], storyKo: "반딧불들이 다시 길을 밝히기 시작했어요.", storyEn: "The fireflies are lighting the path again." },
+    { slug: "moon-mushroom-path", cols: 3, rows: 2, art: "assets/stages/stage-02-moon-mushroom-path.webp", ko: ["두 번째 빛", "달빛 버섯길", "여섯 개의 버섯 돌 사이에서 달빛 점을 찾아보세요."], en: ["Second light", "Moon Mushroom Path", "Find the moonlight dot among six mushroom stones."], storyKo: "잠든 버섯 등불이 하나씩 켜졌어요.", storyEn: "The sleeping mushroom lamps are glowing again." },
+    { slug: "star-seed-garden", cols: 3, rows: 3, art: "assets/stages/stage-03-star-seed-garden.webp", ko: ["세 번째 빛", "별씨앗 정원", "아홉 개의 씨앗 중 특별한 별씨앗을 찾아보세요."], en: ["Third light", "Star Seed Garden", "Find the special star seed among nine seeds."], storyKo: "정원에서 작은 별꽃이 피어났어요.", storyEn: "Tiny star flowers are blooming in the garden." },
+    { slug: "quiet-pond", cols: 4, rows: 3, art: "assets/stages/stage-04-quiet-pond.webp", ko: ["네 번째 빛", "고요한 연못", "열두 개의 물결 돌 중 반짝이는 물방울을 찾아보세요."], en: ["Fourth light", "Quiet Pond", "Find the sparkling drop among twelve ripple stones."], storyKo: "연못에 달빛이 다시 비치기 시작했어요.", storyEn: "Moonlight is shining on the pond again." },
+    { slug: "starlight-tree-hill", cols: 5, rows: 4, art: "assets/stages/stage-05-starlight-tree-hill.webp", ko: ["마지막 빛", "별빛 나무 언덕", "스무 개의 돌 가운데 마지막 별빛 점을 찾아보세요."], en: ["Final light", "Starlight Tree Hill", "Find the final starlight dot among twenty stones."], storyKo: "마지막 빛이 별빛 나무를 향해 날아가요.", storyEn: "The final light is flying back to the starlight tree." }
   ];
+
+  const HOME_SCENE_IMAGE = "assets/hidden-dot-game_hero_2560x900.jpg";
 
   const TUTORIAL = [
     {
@@ -146,7 +148,10 @@ import { ACTION } from "./input/actions.js";
     state.soundOn = !!on;
     const button = $("#soundBtn");
     button.setAttribute("aria-pressed", String(state.soundOn));
-    button.innerHTML = `<span aria-hidden="true">${state.soundOn ? "🔊" : "🔇"}</span><span class="label">${state.soundOn ? COPY.soundOn : COPY.soundOff}</span>`;
+    const icon = state.soundOn
+      ? `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM16 8a5 5 0 010 8M18.5 5.5a9 9 0 010 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      : `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM17 9l5 6M22 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    button.innerHTML = `${icon}<span class="label">${state.soundOn ? COPY.soundOn : COPY.soundOff}</span>`;
     if (window.TW_TTS) {
       try { window.TW_TTS.setEnabled(state.soundOn); } catch (_) {}
     }
@@ -181,10 +186,35 @@ import { ACTION } from "./input/actions.js";
     return Math.abs((seed * 9301 + 49297) % 233280) % total;
   }
 
+  const imgCache = new Set();
+  function preloadImage(url) {
+    if (!url || imgCache.has(url)) return;
+    imgCache.add(url);
+    const img = new Image();
+    img.src = url;
+  }
+
+  let sceneActiveIsA = true;
+  let currentSceneUrl = "";
+  function setSceneImage(url) {
+    if (!url || url === currentSceneUrl) return;   // skip redundant crossfades (e.g. blink re-renders)
+    preloadImage(url);
+    currentSceneUrl = url;
+    const incoming = sceneActiveIsA ? $("#sceneLayerB") : $("#sceneLayerA");
+    const outgoing = sceneActiveIsA ? $("#sceneLayerA") : $("#sceneLayerB");
+    incoming.style.backgroundImage = `url("${url}")`;
+    requestAnimationFrame(() => {
+      incoming.classList.add("is-active");
+      outgoing.classList.remove("is-active");
+    });
+    sceneActiveIsA = !sceneActiveIsA;
+  }
+
   function showScreen(name) {
     state.screen = name;
     $("#homeScreen").classList.toggle("active", name === "home");
     $("#gameScreen").classList.toggle("active", name === "game");
+    if (name === "home") setSceneImage(HOME_SCENE_IMAGE);
     requestAnimationFrame(() => {
       $("#main").focus();
       notifyResize();
@@ -218,16 +248,20 @@ import { ACTION } from "./input/actions.js";
     live(message);
   }
 
-  function renderProgress() {
-    const wrap = $("#progressStars");
+  function fillLights(wrap, count) {
     wrap.innerHTML = "";
     for (let i = 0; i < STAGES.length; i++) {
       const span = document.createElement("span");
-      span.className = `progress-star${i < state.foundCount ? " on" : ""}`;
+      span.className = `progress-star${i < count ? " on" : ""}`;
       span.textContent = "★";
       span.setAttribute("aria-hidden", "true");
       wrap.appendChild(span);
     }
+  }
+
+  function renderProgress() {
+    const wrap = $("#progressStars");
+    fillLights(wrap, state.foundCount);
     wrap.setAttribute("aria-label", currentLang === "en" ? `${state.foundCount} of 5 lights collected` : `빛 ${state.foundCount}개 모음`);
     $("#progressMeter").style.width = `${Math.max(4, state.foundCount / STAGES.length * 100)}%`;
   }
@@ -235,10 +269,12 @@ import { ACTION } from "./input/actions.js";
   function renderStage() {
     const stage = STAGES[state.stageIndex];
     const text = stageText(stage);
+    $("#gameScene").dataset.stage = stage.slug;
+    setSceneImage(stage.art);
+    preloadImage(STAGES[state.stageIndex + 1]?.art);   // warm next scene for a seamless transition
     $("#stageKicker").textContent = text[0];
     $("#stageTitle").textContent = text[1];
     $("#stageDesc").textContent = text[2];
-    $("#boardShell").style.setProperty("--stage-art", `url(\"${stage.art}\")`);
     $("#instruction").textContent = currentLang === "en"
       ? "An ordinary stone has one center dot. The hidden light has five dots in a cross."
       : "보통 돌은 가운데 점 하나, 숨은 빛은 십자 모양 다섯 점입니다.";
@@ -256,8 +292,8 @@ import { ACTION } from "./input/actions.js";
   function renderBoard() {
     const stage = STAGES[state.stageIndex];
     const board = $("#searchBoard");
-    board.style.gridTemplateColumns = `repeat(${stage.cols}, auto)`;
-    board.style.gridTemplateRows = `repeat(${stage.rows}, auto)`;
+    board.style.gridTemplateColumns = `repeat(${stage.cols}, minmax(0, 1fr))`;
+    board.style.gridTemplateRows = `repeat(${stage.rows}, minmax(0, 1fr))`;
     board.innerHTML = "";
     const total = stage.cols * stage.rows;
     for (let index = 0; index < total; index++) {
@@ -388,6 +424,11 @@ import { ACTION } from "./input/actions.js";
     $("#stageDialogKicker").textContent = currentLang === "en" ? "Light found" : "빛 점을 찾았어요";
     $("#stageDialogTitle").textContent = currentLang === "en" ? `${text[1]} is glowing!` : `${text[1]}이 환해졌어요!`;
     $("#stageDialogDesc").textContent = storyText(stage);
+    fillLights($("#stageDialogLights"), state.foundCount);
+    const upcoming = STAGES[state.stageIndex + 1];
+    $("#stageDialogNext").textContent = upcoming
+      ? (currentLang === "en" ? `Next adventure — ${upcoming.en[1]}` : `다음 모험 — ${upcoming.ko[1]}`)
+      : (currentLang === "en" ? "Only the final light remains." : "이제 마지막 빛만 남았어요.");
     $("#nextStageBtn").textContent = state.stageIndex === STAGES.length - 1 ? (currentLang === "en" ? "Wake the tree" : "별빛 나무 깨우기") : COPY.next;
     $("#stageDialog").showModal();
     $("#nextStageBtn").focus();
@@ -413,6 +454,7 @@ import { ACTION } from "./input/actions.js";
   }
 
   function openCompleteDialog() {
+    fillLights($("#completeLights"), STAGES.length);
     $("#completeDialog").showModal();
     $("#playAgainBtn").focus();
     speak(COPY.finish, { assertive: true });
@@ -420,7 +462,7 @@ import { ACTION } from "./input/actions.js";
   }
 
   function goHome() {
-    [$("#stageDialog"), $("#completeDialog"), $("#tutorialDialog")].forEach(dialog => { if (dialog.open) dialog.close(); });
+    [$("#stageDialog"), $("#completeDialog"), $("#tutorialDialog"), $("#helpDialog"), $("#tactileDialog")].forEach(dialog => { if (dialog.open) dialog.close(); });
     showScreen("home");
     if (state.connected && state.sdk) {
       try { state.sdk.displayAllDown(); } catch (_) {}
@@ -438,7 +480,7 @@ import { ACTION } from "./input/actions.js";
 
   function renderTutorial() {
     const step = TUTORIAL[state.tutorialIndex];
-    $("#tutorialStep").textContent = currentLang === "en" ? `Tutorial ${state.tutorialIndex + 1} / 7` : `튜토리얼 ${state.tutorialIndex + 1} / 7`;
+    $("#tutorialStep").textContent = currentLang === "en" ? `Mission briefing ${state.tutorialIndex + 1} / 7` : `모험 안내서 ${state.tutorialIndex + 1} / 7`;
     $("#tutorialTitle").textContent = tutorialText(step, "title");
     $("#tutorialDesc").textContent = tutorialText(step, "desc");
     $("#tutorialVisual").textContent = tutorialText(step, "visual");
@@ -485,14 +527,11 @@ import { ACTION } from "./input/actions.js";
     for (let y = 0; y < 40; y++) {
       for (let x = 0; x < 60; x++) {
         ctx.beginPath();
-        ctx.arc((x + .5) * cellW, (y + .5) * cellH, Math.max(1.4, Math.min(cellW, cellH) * .34), 0, Math.PI * 2);
-        ctx.fillStyle = matrix[y][x] ? "#fff0a8" : "#1b3b5b";
-        ctx.shadowColor = matrix[y][x] ? "rgba(255, 215, 93, .85)" : "transparent";
-        ctx.shadowBlur = matrix[y][x] ? 5 : 0;
+        ctx.arc((x + .5) * cellW, (y + .5) * cellH, Math.max(1.1, Math.min(cellW, cellH) * .22), 0, Math.PI * 2);
+        ctx.fillStyle = matrix[y][x] ? "#ffe174" : "#17304c";
         ctx.fill();
       }
     }
-    ctx.shadowBlur = 0;
     const hex = matrixToHex(matrix);
     $("#hexMeta").textContent = `${hex.length / 2} bytes · ${hex.length} hex`;
     window.__latestDotpadHex = hex;
@@ -542,7 +581,7 @@ import { ACTION } from "./input/actions.js";
   async function loadSDK() {
     if (state.sdk) return true;
     try {
-      const mod = await import("../dotpad-sdk/DotPadSDK-3.0.0.js");
+      const mod = await import("./dotpad-sdk/DotPadSDK-3.0.0.js");
       state.keyCodes = mod.KeyCodes;
       state.dataCodes = mod.DataCodes;
       state.sdk = new mod.DotPadSDK();
@@ -583,6 +622,9 @@ import { ACTION } from "./input/actions.js";
     const loaded = await loadSDK();
     if (!loaded) { setStatus(COPY.sdkMissing, "error"); speak(COPY.sdkMissing); return; }
     setStatus(COPY.connectionWait); speak(COPY.connectionWait);
+    const connectBtn = $("#connectBtn");
+    connectBtn.classList.add("is-loading");
+    connectBtn.setAttribute("aria-busy", "true");
     try {
       let device = null;
       try {
@@ -598,6 +640,9 @@ import { ACTION } from "./input/actions.js";
     } catch (error) {
       console.error("[DotPad connect]", error);
       setStatus(COPY.connectionFail, "error"); speak(COPY.connectionFail);
+    } finally {
+      connectBtn.classList.remove("is-loading");
+      connectBtn.removeAttribute("aria-busy");
     }
   }
 
@@ -625,7 +670,7 @@ import { ACTION } from "./input/actions.js";
   }
 
   function handleKeyboard(event) {
-    if (state.screen !== "game" || $("#tutorialDialog").open || $("#stageDialog").open || $("#completeDialog").open) return;
+    if (state.screen !== "game" || $("#tutorialDialog").open || $("#stageDialog").open || $("#completeDialog").open || $("#helpDialog").open || $("#tactileDialog").open) return;
     let handled = true;
     switch (event.key) {
       case "ArrowLeft": moveCursor(-1, 0); break;
@@ -670,6 +715,11 @@ import { ACTION } from "./input/actions.js";
   $("#tutorialPrevBtn").addEventListener("click", tutorialPrev);
   $("#tutorialReplayBtn").addEventListener("click", () => speak(tutorialText(TUTORIAL[state.tutorialIndex], "audio")));
   $("#closeTutorialBtn").addEventListener("click", () => $("#tutorialDialog").close());
+  // Secondary drawers — <dialog> handles Escape + focus return automatically.
+  $("#helpBtn").addEventListener("click", () => $("#helpDialog").showModal());
+  $("#closeHelpBtn").addEventListener("click", () => $("#helpDialog").close());
+  $("#tactileBtn").addEventListener("click", () => { $("#tactileDialog").showModal(); renderTechnicalPreview(); });
+  $("#closeTactileBtn").addEventListener("click", () => $("#tactileDialog").close());
   $("#nextStageBtn").addEventListener("click", nextStage);
   $("#stageHomeBtn").addEventListener("click", goHome);
   $("#completeHomeBtn").addEventListener("click", goHome);
@@ -693,22 +743,36 @@ import { ACTION } from "./input/actions.js";
 
   // Localized minimal UI strings controlled by host query language.
   if (currentLang === "en") {
+    const setLabel = (sel, text) => { const el = $(`${sel} .btn-label`); if (el) el.textContent = text; };
     $("#brandTitle").textContent = "Find the Hidden Dot";
-    $("#homeEyebrow").textContent = "A tactile search game for children";
+    $("#homeEyebrow").textContent = "Starlight forest tactile adventure";
     $("#homeTitle").innerHTML = "Find the<br>Hidden Dot";
     $("#homeLead").textContent = "Find the different light dot by touch and wake the sleeping starlight tree.";
     $("#homeStory").textContent = "A night wind hid five lights from the starlight tree among the forest stones. Explore the dots slowly with Dotty, then confirm the special light pattern.";
-    $("#tutorialBtn").textContent = "Learn from the beginning";
-    $("#quickStartBtn").textContent = "Quick start";
+    $("#homeMeta").textContent = "Very easy · about 3 min · 60×40 DotPad · Voice guide";
+    setLabel("#tutorialBtn", "Learn from the beginning");
+    setLabel("#quickStartBtn", "Quick start");
     $("#boardHelp").textContent = "Move with the arrow keys and press Enter to check. Press Space to hear the current position.";
-    $("#checkBtn").textContent = "✓ Check this spot";
-    $("#readBtn").textContent = "🔊 Current position";
-    $("#hintBtn").textContent = "💡 Hint";
-    $("#restartBtn").textContent = "↻ Restart";
+    setLabel("#checkBtn", "Check this spot");
+    setLabel("#readBtn", "Hear position");
+    setLabel("#hintBtn", "Hint");
+    setLabel("#restartBtn", "Restart");
+    setLabel("#helpBtn", "Controls");
+    setLabel("#tactileBtn", "Tactile board");
+    setLabel("#tutorialReplayBtn", "Replay");
+    $("#helpTitle").textContent = "Controls";
+    $("#tactileTitle").textContent = "Tactile board preview";
+    $("#tactileHint").textContent = "This is the 60×40 dot pattern sent to the DotPad. You can feel the same shape by touch without the screen.";
+    $("#instruction").textContent = "An ordinary stone has one center dot. The hidden light has five dots in a cross.";
+    // localized control-list labels
+    const ctl = document.querySelectorAll("#controlList .control-row span");
+    const ctlEn = ["Move selection", "Check position", "Hear position", "Hear full board", "Move up · down", "Hear a hint", "Restart this stage"];
+    ctl.forEach((el, i) => { if (ctlEn[i]) el.textContent = ctlEn[i]; });
   }
 
   updateConnectionUI();
   setSound(true, false);
+  setSceneImage(HOME_SCENE_IMAGE);
   loadSDK(); // silent preload; simulator remains available if missing.
   renderTechnicalPreview();
   postHost("ready", { version: "1.0.0", resolution: "60x40", tts: "TW_TTS" });

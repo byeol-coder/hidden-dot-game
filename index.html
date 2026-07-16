@@ -3,205 +3,247 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#081631" />
-  <meta name="description" content="손끝으로 특별한 빛 점을 찾는, 시각장애 아동을 위한 60×40 닷패드 촉각 탐색 게임. TTS 음성·촉각·키보드만으로 완주할 수 있습니다." />
-  <title>숨은 점 찾기 · Find the Hidden Dot · Dot Games</title>
-
-  <!-- Open Graph / social share -->
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Dot Games" />
-  <meta property="og:title" content="숨은 점 찾기 · Find the Hidden Dot" />
-  <meta property="og:description" content="손끝으로 다른 촉각 패턴을 찾아 별빛 나무의 다섯 빛을 깨우는, 시각장애 아동을 위한 촉각 탐색 게임." />
-  <meta property="og:image" content="./assets/card-thumbnail-600x800.jpg" />
-  <meta property="og:locale" content="ko_KR" />
-  <meta property="og:locale:alternate" content="en_US" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="숨은 점 찾기 · Find the Hidden Dot" />
-  <meta name="twitter:description" content="TTS 음성·촉각 핀·키보드만으로 처음부터 끝까지 플레이하는 60×40 닷패드 접근성 게임." />
-  <meta name="twitter:image" content="./assets/card-thumbnail-600x800.jpg" />
-
-  <!-- 음성 모듈. 임베드(embed=1) 시에는 호스트의 공용 TW_TTS를 우선 사용하고,
-       단독 배포(GitHub Pages 등)에서는 동봉된 TW_TTS 호환 tts.js가 음성을 제공합니다.
-       게임 코드 자체에는 별도 speechSynthesis TTS 엔진을 넣지 않습니다.
-       defer: HTML 파싱을 막지 않으면서 module인 main.js보다 먼저 실행됩니다. -->
-  <script defer src="./tts.js"></script>
-  <link rel="preload" as="image" href="./assets/hero-banner-2560x900.jpg" fetchpriority="high" />
+  <meta name="theme-color" content="#050d1d" />
+  <meta name="description" content="손끝으로 특별한 빛 점을 찾는 아동용 촉각 탐색 게임" />
+  <title>숨은 점 찾기 · Dot Games</title>
+  <!-- Dot Games 공용 음성 모듈. 게임 자체에서는 별도 TTS 엔진을 만들지 않습니다. -->
+  <script src="/tts.js"></script>
+  <link rel="preload" as="image" href="./assets/hidden-dot-game_hero_2560x900.jpg" />
   <link rel="stylesheet" href="./styles/game.css" />
-  <link rel="stylesheet" href="./styles/hero-refresh.css" />
+  <link rel="stylesheet" href="./styles/cinematic.css" />
+  <link rel="stylesheet" href="./styles/responsive.css" />
 </head>
 <body>
 <a class="skip-link" href="#main">게임 내용으로 건너뛰기</a>
-<div class="app-shell" id="appShell">
-  <header class="topbar" aria-label="게임 상단 메뉴">
+
+<div class="viewport" id="appShell">
+  <!-- ===== Scene background (full-bleed cinematic world) ===== -->
+  <div class="scene" aria-hidden="true">
+    <div class="scene-layer" id="sceneLayerA"></div>
+    <div class="scene-layer" id="sceneLayerB"></div>
+    <div class="scene-vignette"></div>
+    <div class="scene-particles" id="sceneParticles"></div>
+  </div>
+
+  <!-- ===== Compact header ===== -->
+  <header class="hud-bar" aria-label="게임 상단 메뉴">
     <div class="brand">
-      <div class="brand-mark" aria-hidden="true">•</div>
-      <div class="brand-copy">
-        <div class="brand-title" id="brandTitle">숨은 점 찾기</div>
-        <div class="brand-sub">Dot Games · 60×40 tactile game</div>
-      </div>
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-title" id="brandTitle">숨은 점 찾기</span>
     </div>
-    <div class="top-actions">
-      <button class="btn small" id="soundBtn" type="button" aria-pressed="true"><span aria-hidden="true">🔊</span><span class="label">음성 켜짐</span></button>
-      <button class="btn small" id="connectBtn" type="button"><span class="connection-dot" aria-hidden="true"></span><span class="label">닷패드 연결</span></button>
-      <button class="btn small ghost" id="exitBtn" type="button"><span aria-hidden="true">←</span><span class="exit-label">나가기</span></button>
+    <div class="hud-actions">
+      <button class="sys-btn" id="soundBtn" type="button" aria-pressed="true"></button>
+      <button class="sys-btn" id="connectBtn" type="button"></button>
+      <button class="sys-btn ghost" id="exitBtn" type="button">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="label exit-label">나가기</span>
+      </button>
     </div>
   </header>
 
   <main id="main" tabindex="-1">
-    <section id="homeScreen" class="screen active" aria-labelledby="homeTitle" aria-describedby="homeLead homeStory">
-      <div class="hero">
-        <div class="hero-copy">
-          <div class="eyebrow" id="homeEyebrow">아동용 촉각 탐색 게임</div>
-          <h1 id="homeTitle">숨은 점<br>찾기</h1>
-          <p class="hero-lead" id="homeLead">손끝으로 다른 모양의 빛 점을 찾아, 잠든 별빛 나무를 깨워주세요.</p>
-          <p class="story" id="homeStory">밤바람이 불자 별빛 나무의 빛 다섯 개가 숲속 돌 사이에 숨어버렸어요. 작은 안내 친구 도티와 함께 점들을 천천히 만져보고, 특별한 빛 모양을 찾으면 확인해 주세요.</p>
-          <div class="hero-actions" aria-label="게임 시작 방법">
-            <button class="btn primary" id="tutorialBtn" type="button">처음부터 배우기</button>
-            <button class="btn cyan" id="quickStartBtn" type="button">바로 시작</button>
-          </div>
-          <div class="meta-row" aria-label="게임 정보">
-            <span class="chip">★ 매우 쉬움</span>
-            <span class="chip">⏱ 약 3분</span>
-            <span class="chip">⠿ 60×40 닷패드</span>
-            <span class="chip">🔊 TW_TTS</span>
-          </div>
+    <!-- ============================ INTRO ============================ -->
+    <section id="homeScreen" class="screen active" aria-labelledby="homeTitle">
+      <div class="intro">
+        <p class="eyebrow" id="homeEyebrow">별빛 숲 촉각 어드벤처</p>
+        <h1 id="homeTitle">숨은 점<br>찾기</h1>
+        <p class="intro-lead" id="homeLead">손끝으로 다른 모양의 빛 점을 찾아, 잠든 별빛 나무를 깨워주세요.</p>
+        <p class="intro-story" id="homeStory">밤바람이 별빛 나무의 빛 다섯 개를 숲속 돌 사이에 숨겼어요. 안내 친구 도티와 함께 점을 만지고, 특별한 빛을 찾아주세요.</p>
+        <div class="intro-actions">
+          <button class="btn primary xl" id="quickStartBtn" type="button">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+            <span class="btn-label">바로 시작</span>
+          </button>
+          <button class="btn secondary" id="tutorialBtn" type="button">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-2.8L7 19l1-6-4-4 5.5-.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <span class="btn-label">처음부터 배우기</span>
+          </button>
         </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="firefly f1"></div><div class="firefly f2"></div><div class="firefly f3"></div>
-          <div class="dotty-wrap">
-            <div class="dotty-glow"></div>
-            <svg class="dotty" viewBox="0 0 300 300" role="img" aria-label="파란 빛 안내 친구 도티">
-              <defs>
-                <radialGradient id="bodyG" cx="35%" cy="28%" r="70%"><stop offset="0" stop-color="#d7fbff"/><stop offset=".35" stop-color="#78eaff"/><stop offset="1" stop-color="#19a8de"/></radialGradient>
-                <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-              </defs>
-              <path d="M151 38 C151 16 170 10 179 22" fill="none" stroke="#8ceeff" stroke-width="7" stroke-linecap="round"/>
-              <circle cx="184" cy="21" r="13" fill="#ffd45e" filter="url(#glow)"/>
-              <ellipse cx="150" cy="161" rx="105" ry="100" fill="url(#bodyG)" stroke="#bdf8ff" stroke-width="5"/>
-              <ellipse cx="48" cy="175" rx="30" ry="19" fill="#49cde9"/>
-              <ellipse cx="252" cy="175" rx="30" ry="19" fill="#49cde9"/>
-              <ellipse cx="111" cy="150" rx="18" ry="26" fill="#0a315f"/><ellipse cx="189" cy="150" rx="18" ry="26" fill="#0a315f"/>
-              <circle cx="105" cy="142" r="6" fill="white"/><circle cx="183" cy="142" r="6" fill="white"/>
-              <path d="M128 190 Q150 210 172 190" fill="none" stroke="#0a315f" stroke-width="8" stroke-linecap="round"/>
-              <ellipse cx="85" cy="184" rx="13" ry="7" fill="#ffb7bf" opacity=".7"/><ellipse cx="215" cy="184" rx="13" ry="7" fill="#ffb7bf" opacity=".7"/>
-              <circle cx="104" cy="269" r="5" fill="#9ef3ff"/><circle cx="150" cy="280" r="7" fill="#ffe37b"/><circle cx="196" cy="267" r="4" fill="#9ef3ff"/>
-            </svg>
-            <svg class="star-tree" viewBox="0 0 220 260">
-              <path d="M102 255 C95 210 104 171 91 130 C79 93 91 58 110 30 C130 65 137 97 124 134 C111 172 122 217 118 255Z" fill="#4b2f22"/>
-              <path d="M109 37 L99 57 L76 60 L93 76 L88 99 L109 88 L130 99 L126 76 L143 60 L120 57Z" fill="#5e7184" stroke="#ffd76a" stroke-width="3"/>
-              <circle cx="84" cy="120" r="8" fill="#3b5063"/><circle cx="135" cy="135" r="8" fill="#3b5063"/><circle cx="83" cy="174" r="8" fill="#3b5063"/><circle cx="137" cy="188" r="8" fill="#3b5063"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-      <div class="how-grid" aria-label="플레이 방법">
-        <article class="how-card"><div class="how-num">1</div><strong>손끝으로 탐색해요</strong><p>보통 점은 한 점, 숨은 빛은 십자 모양 다섯 점으로 느껴져요.</p></article>
-        <article class="how-card"><div class="how-num">2</div><strong>위치를 선택해요</strong><p>방향키 또는 닷패드 기능키로 찾은 위치까지 선택 테두리를 움직여요.</p></article>
-        <article class="how-card"><div class="how-num">3</div><strong>찾았다고 확인해요</strong><p>Enter 또는 F3을 누르면 빛 점을 모으고 다음 숲이 열려요.</p></article>
+        <p class="intro-meta" id="homeMeta">매우 쉬움 · 약 3분 · 60×40 닷패드 · 음성 안내</p>
       </div>
     </section>
 
+    <!-- ============================ PLAY ============================ -->
     <section id="gameScreen" class="screen" aria-labelledby="stageTitle">
-      <div class="game-layout">
-        <section class="game-main">
-          <div class="stage-head">
-            <div>
-              <div class="stage-kicker" id="stageKicker">첫 번째 빛</div>
-              <h2 class="stage-title" id="stageTitle">반딧불 풀밭</h2>
-              <p class="stage-desc" id="stageDesc">네 개의 돌 가운데 숨어 있는 빛 점을 찾아보세요.</p>
-            </div>
-            <div class="progress-stars" id="progressStars" aria-label="모은 빛 0개"></div>
+      <div class="stage" id="gameScene" data-stage="firefly-meadow">
+        <!-- Mission HUD -->
+        <div class="mission">
+          <div class="mission-copy">
+            <p class="stage-kicker" id="stageKicker">첫 번째 빛</p>
+            <h2 class="stage-title" id="stageTitle">반딧불 풀밭</h2>
+            <p class="stage-desc" id="stageDesc">네 개의 돌 가운데 숨어 있는 빛 점을 찾아보세요.</p>
           </div>
-          <div class="instruction" id="instruction">보통 돌은 가운데 점 하나, 숨은 빛은 십자 모양 다섯 점입니다.</div>
+          <div class="progress-cluster">
+            <div class="lights" id="progressStars" aria-label="모은 빛 0개"></div>
+            <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressMeter"></div></div>
+          </div>
+        </div>
+
+        <!-- Play area -->
+        <div class="play">
+          <p class="instruction" id="instruction">보통 돌은 가운데 점 하나, 숨은 빛은 십자 모양 다섯 점입니다.</p>
           <div class="board-shell" id="boardShell">
             <div id="searchBoard" class="search-board" role="grid" aria-label="숨은 점 찾기 촉각 보드"></div>
           </div>
           <p class="board-help" id="boardHelp">화살표로 선택 위치를 옮기고 Enter로 확인하세요. Space를 누르면 현재 위치를 들을 수 있어요.</p>
-          <div class="game-actions">
-            <button class="btn" id="checkBtn" type="button">✓ 이곳 확인</button>
-            <button class="btn" id="readBtn" type="button">🔊 현재 위치</button>
-            <button class="btn" id="hintBtn" type="button">💡 힌트</button>
-            <button class="btn" id="restartBtn" type="button">↻ 다시 시작</button>
-          </div>
-        </section>
+        </div>
 
-        <aside class="side" aria-label="게임 정보와 조작 안내">
-          <section class="side-card">
-            <h3>도티의 안내</h3>
-            <div id="statusMessage" class="status-message" role="status" aria-live="polite" aria-atomic="true">게임을 시작할 준비가 됐어요.</div>
-            <div class="meter" aria-hidden="true"><span id="progressMeter"></span></div>
-          </section>
-          <section class="side-card">
-            <h3>조작 방법</h3>
-            <div class="control-list">
-              <div class="control-row"><kbd>← ↑ ↓ →</kbd><span>선택 위치 이동</span></div>
-              <div class="control-row"><kbd>Enter · F3</kbd><span>현재 위치 확인</span></div>
-              <div class="control-row"><kbd>Space · F4</kbd><span>현재 위치 듣기</span></div>
-              <div class="control-row"><kbd>Pan All</kbd><span>전체 상황 듣기</span></div>
-              <div class="control-row"><kbd>F1 · F2</kbd><span>위·아래 이동</span></div>
-            </div>
-          </section>
-          <section class="side-card" id="technicalCard">
-            <h3>60×40 닷패드 프레임</h3>
-            <div class="tech-preview">
-              <canvas id="dotpadCanvas" width="600" height="400" aria-label="닷패드 60×40 출력 미리보기"></canvas>
-              <div class="preview-meta"><span id="hexMeta">300 bytes · 600 hex</span><span id="padStatus">시뮬레이터</span></div>
-            </div>
-          </section>
-        </aside>
+        <!-- Dotty companion + status -->
+        <div class="dotty-ribbon">
+          <span class="dotty-avatar" aria-hidden="true"></span>
+          <p id="statusMessage" class="status-message" role="status" aria-live="polite" aria-atomic="true">게임을 시작할 준비가 됐어요.</p>
+        </div>
+
+        <!-- Context action bar -->
+        <div class="action-bar">
+          <button class="btn primary act" id="checkBtn" type="button">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="btn-label">이곳 확인</span>
+            <kbd class="btn-key">Enter</kbd>
+          </button>
+          <button class="btn secondary act" id="readBtn" type="button">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM16 8a5 5 0 010 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="btn-label">현재 위치 듣기</span>
+            <kbd class="btn-key">Space</kbd>
+          </button>
+          <button class="btn utility act" id="hintBtn" type="button">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 013.5 10.9c-.6.4-.9 1-.9 1.6H9.4c0-.6-.3-1.2-.9-1.6A6 6 0 0112 3z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="btn-label">힌트</span>
+            <kbd class="btn-key">H</kbd>
+          </button>
+          <button class="btn ghost act" id="restartBtn" type="button">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v5h5M20 20v-5h-5M19 9a7.5 7.5 0 00-13-3L4 9m1 6a7.5 7.5 0 0013 3l2-3" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="btn-label">다시 시작</span>
+            <kbd class="btn-key">R</kbd>
+          </button>
+        </div>
+
+        <!-- Secondary utilities -->
+        <div class="drawer-triggers">
+          <button class="mini-btn" id="helpBtn" type="button" aria-haspopup="dialog">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.2 9a2.8 2.8 0 115.3 1.2c-.5 1-1.7 1.4-2.2 2.2-.2.3-.3.7-.3 1.1M12 17.5h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            <span class="btn-label">조작 도움말</span>
+          </button>
+          <button class="mini-btn tactile-trigger" id="tactileBtn" type="button" aria-haspopup="dialog">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><circle cx="7" cy="7" r="1.6"/><circle cx="12" cy="7" r="1.6"/><circle cx="17" cy="7" r="1.6"/><circle cx="7" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="17" cy="12" r="1.6"/><circle cx="7" cy="17" r="1.6"/><circle cx="12" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></g></svg>
+            <span class="btn-label">촉각판 보기</span>
+          </button>
+        </div>
       </div>
     </section>
   </main>
 </div>
 
-<dialog id="tutorialDialog" aria-labelledby="tutorialTitle">
+<!-- ===== Help dialog (controls) ===== -->
+<dialog id="helpDialog" class="panel-dialog" aria-labelledby="helpTitle">
   <div class="dialog-body">
     <div class="dialog-top">
-      <div>
-        <div class="dialog-step" id="tutorialStep">튜토리얼 1 / 7</div>
-        <h2 class="dialog-title" id="tutorialTitle">시작 안내</h2>
+      <h2 class="dialog-title sm" id="helpTitle">조작 방법</h2>
+      <button class="icon-close" id="closeHelpBtn" type="button" aria-label="도움말 닫기">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="control-list" id="controlList">
+      <div class="control-row"><kbd>← ↑ ↓ →</kbd><span>선택 위치 이동</span></div>
+      <div class="control-row"><kbd>Enter · F3</kbd><span>현재 위치 확인</span></div>
+      <div class="control-row"><kbd>Space · F4</kbd><span>현재 위치 듣기</span></div>
+      <div class="control-row"><kbd>Pan All</kbd><span>전체 상황 듣기</span></div>
+      <div class="control-row"><kbd>F1 · F2</kbd><span>위·아래 이동</span></div>
+      <div class="control-row"><kbd>H</kbd><span>힌트 듣기</span></div>
+      <div class="control-row"><kbd>R · LPF1</kbd><span>이 단계 다시 시작</span></div>
+    </div>
+  </div>
+</dialog>
+
+<!-- ===== Tactile preview dialog (simulator) ===== -->
+<dialog id="tactileDialog" class="panel-dialog" aria-labelledby="tactileTitle">
+  <div class="dialog-body" id="technicalCard">
+    <div class="dialog-top">
+      <h2 class="dialog-title sm" id="tactileTitle">촉각판 미리보기</h2>
+      <button class="icon-close" id="closeTactileBtn" type="button" aria-label="촉각판 닫기">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <p class="dialog-hint" id="tactileHint">닷패드에 출력되는 60×40 점 패턴이에요. 화면 없이도 손끝으로 같은 모양을 만질 수 있어요.</p>
+    <div class="tech-preview">
+      <canvas id="dotpadCanvas" width="600" height="400" aria-label="닷패드 60×40 출력 미리보기"></canvas>
+      <div class="preview-meta"><span id="hexMeta">300 bytes · 600 hex</span><span id="padStatus">시뮬레이터</span></div>
+    </div>
+  </div>
+</dialog>
+
+<!-- ===== Tutorial (mission briefing) ===== -->
+<dialog id="tutorialDialog" class="briefing-dialog" aria-labelledby="tutorialTitle">
+  <div class="briefing">
+    <div class="briefing-art" aria-hidden="true"></div>
+    <div class="briefing-body">
+      <div class="dialog-top">
+        <div>
+          <p class="dialog-step" id="tutorialStep">모험 안내서 1 / 7</p>
+          <h2 class="dialog-title" id="tutorialTitle">시작 안내</h2>
+        </div>
+        <button class="icon-close" id="closeTutorialBtn" type="button" aria-label="안내서 닫기">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </button>
       </div>
-      <button class="btn small ghost" id="closeTutorialBtn" type="button" aria-label="튜토리얼 닫기">✕</button>
-    </div>
-    <p class="dialog-desc" id="tutorialDesc"></p>
-    <div class="channel-grid">
-      <div class="channel"><b>화면</b><p id="tutorialVisual"></p></div>
-      <div class="channel"><b>촉각</b><p id="tutorialTactile"></p></div>
-      <div class="channel"><b>음성</b><p id="tutorialAudio"></p></div>
-    </div>
-    <div class="tutorial-dots" id="tutorialDots" aria-hidden="true"></div>
-    <div class="dialog-actions">
-      <button class="btn" id="tutorialPrevBtn" type="button">이전</button>
-      <div style="display:flex;gap:9px;flex-wrap:wrap">
-        <button class="btn" id="tutorialReplayBtn" type="button">🔊 다시 듣기</button>
-        <button class="btn primary" id="tutorialNextBtn" type="button">다음</button>
+      <p class="dialog-desc" id="tutorialDesc"></p>
+      <div class="channel-row">
+        <div class="channel"><span class="channel-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span>
+          <div><b>화면</b><p id="tutorialVisual"></p></div></div>
+        <div class="channel"><span class="channel-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><g fill="currentColor"><circle cx="8" cy="8" r="1.5"/><circle cx="12" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/></g></svg></span>
+          <div><b>촉각</b><p id="tutorialTactile"></p></div></div>
+        <div class="channel"><span class="channel-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 9v6h3l4 3V6L8 9zM15 9a4 4 0 010 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><b>음성</b><p id="tutorialAudio"></p></div></div>
+      </div>
+      <div class="tutorial-dots" id="tutorialDots" aria-hidden="true"></div>
+      <div class="dialog-actions">
+        <button class="btn ghost" id="tutorialPrevBtn" type="button">이전</button>
+        <div class="dialog-actions-right">
+          <button class="btn secondary" id="tutorialReplayBtn" type="button">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9v6h3l4 3V6L8 9zM15 9a4 4 0 010 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="btn-label">다시 듣기</span>
+          </button>
+          <button class="btn primary" id="tutorialNextBtn" type="button">다음</button>
+        </div>
       </div>
     </div>
   </div>
 </dialog>
 
-<dialog id="stageDialog" aria-labelledby="stageDialogTitle">
-  <div class="dialog-body">
+<!-- ===== Stage clear (result scene) ===== -->
+<dialog id="stageDialog" class="scene-dialog" aria-labelledby="stageDialogTitle">
+  <div class="scene-card">
     <img class="result-art" src="assets/results/stage-clear-light-found.webp" alt="" aria-hidden="true" />
-    <div class="dialog-step" id="stageDialogKicker">빛 점을 찾았어요</div>
-    <h2 class="dialog-title" id="stageDialogTitle">반딧불 풀밭이 환해졌어요!</h2>
-    <p class="dialog-desc" id="stageDialogDesc">첫 번째 빛을 별빛 나무에 돌려보냈어요.</p>
-    <div class="dialog-actions">
-      <button class="btn" id="stageHomeBtn" type="button">처음 화면</button>
-      <button class="btn primary" id="nextStageBtn" type="button">다음 모험</button>
+    <div class="scene-card-body">
+      <p class="dialog-step" id="stageDialogKicker">빛 점을 찾았어요</p>
+      <h2 class="dialog-title" id="stageDialogTitle">반딧불 풀밭이 환해졌어요!</h2>
+      <p class="dialog-desc" id="stageDialogDesc">첫 번째 빛을 별빛 나무에 돌려보냈어요.</p>
+      <div class="lights lights-lg" id="stageDialogLights" aria-hidden="true"></div>
+      <p class="scene-next" id="stageDialogNext"></p>
+      <div class="dialog-actions">
+        <button class="btn ghost" id="stageHomeBtn" type="button">처음 화면</button>
+        <button class="btn primary" id="nextStageBtn" type="button">다음 모험</button>
+      </div>
     </div>
   </div>
 </dialog>
 
-<dialog id="completeDialog" aria-labelledby="completeTitle">
-  <div class="dialog-body">
+<!-- ===== Game complete (ending scene) ===== -->
+<dialog id="completeDialog" class="scene-dialog ending" aria-labelledby="completeTitle">
+  <div class="scene-card">
     <img class="result-art" src="assets/results/game-complete-starlight-tree.webp" alt="" aria-hidden="true" />
-    <div class="dialog-step">모든 빛을 찾았어요</div>
-    <h2 class="dialog-title" id="completeTitle">별빛 나무가 다시 깨어났어요!</h2>
-    <p class="dialog-desc" id="completeDesc">도티와 함께 다섯 개의 숨은 점을 모두 찾았어요. 천천히 만지고, 위치를 기억하고, 끝까지 확인한 멋진 탐험이었어요.</p>
-    <div class="dialog-actions">
-      <button class="btn" id="completeHomeBtn" type="button">처음 화면</button>
-      <button class="btn primary" id="playAgainBtn" type="button">한 번 더 놀기</button>
+    <div class="scene-card-body">
+      <p class="dialog-step">모든 빛을 찾았어요</p>
+      <h2 class="dialog-title" id="completeTitle">별빛 나무가 다시 깨어났어요!</h2>
+      <p class="dialog-desc" id="completeDesc">도티와 함께 다섯 개의 숨은 점을 모두 찾았어요. 천천히 만지고, 위치를 기억하고, 끝까지 확인한 멋진 탐험이었어요.</p>
+      <div class="lights lights-lg" id="completeLights" aria-hidden="true"></div>
+      <div class="dialog-actions">
+        <button class="btn ghost" id="completeHomeBtn" type="button">처음 화면</button>
+        <button class="btn primary" id="playAgainBtn" type="button">한 번 더 놀기</button>
+      </div>
     </div>
   </div>
 </dialog>

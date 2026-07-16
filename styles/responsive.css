@@ -1,0 +1,111 @@
+/* =============================================================
+   responsive.css — breakpoints, embed, motion / a11y preferences
+   ============================================================= */
+
+/* ---- Desktop: keep the play area within one viewport ---- */
+@media (min-width: 861px) {
+  .stage { max-width: 1120px; margin: 0 auto; }
+  /* cap board width so a landscape desktop keeps board + controls in one view */
+  .board-shell { width: min(760px, 82vh); }
+}
+
+/* ---- Tablet / small laptop ---- */
+@media (max-width: 1024px) {
+  .briefing { grid-template-columns: 1fr; }
+  .briefing-art { min-height: 150px; }
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 860px) {
+  body { overflow-y: auto; }
+  .viewport { min-height: 100dvh; }
+  .scene-layer { background-position: var(--scene-position-mobile); }
+
+  #homeScreen { align-items: flex-start; }
+  .intro { max-width: 100%; padding-top: 6vh; }
+  #homeTitle { font-size: clamp(42px, 13vw, 62px); }
+  .intro-actions { flex-direction: column; align-items: stretch; }
+  .intro-actions .btn { width: 100%; }
+
+  .mission { flex-direction: column; gap: 12px; }
+  .lights { align-self: flex-start; }
+
+  .action-bar { grid-template-columns: 1fr 1fr; }
+  .action-bar .btn.act { flex-direction: column; gap: 5px; min-height: 66px; text-align: center; }
+  .action-bar .btn.act .btn-key { margin-inline-start: 0; }
+
+  .channel-row { grid-template-columns: 1fr; }
+  .scene-card .result-art { aspect-ratio: 4 / 3; }
+}
+
+/* ---- Narrow phones ---- */
+@media (max-width: 430px) {
+  .viewport { padding-left: 12px; padding-right: 12px; }
+  .brand-title { font-size: 15px; }
+  .sys-btn .label { display: none; }          /* icons only, labels remain in aria/title */
+  .sys-btn { padding: 8px 10px; }
+  .search-board { gap: clamp(12px, 4.4vw, 22px); }
+  .spot { width: clamp(46px, 17vw, 70px); }
+  .instruction { font-size: 12.5px; }
+}
+
+/* Keep an accessible name on icon-only header buttons at narrow widths.
+   (labels are still in the DOM for screen readers; only visually hidden) */
+@media (max-width: 430px) {
+  .sys-btn .label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+}
+
+/* ============================================================
+   Embed mode (?embed=1)
+   ============================================================ */
+.embed .viewport { padding-top: 10px; }
+.embed .brand-title { font-size: 16px; }
+.embed .intro-story { display: none; }              /* trim duplicate brand copy */
+.embed #homeMeta { display: none; }
+/* Fit core play area to host frame; avoid double scroll */
+@media (min-width: 861px) {
+  .embed, .embed body { overflow: hidden; }
+  .embed .viewport { height: 100dvh; }
+}
+
+/* Preview off: hide the technical tactile simulator entirely */
+.preview-off .tactile-trigger { display: none; }
+
+/* ============================================================
+   Motion / transparency / contrast preferences
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .scene-layer.is-active { animation: none; transform: scale(1.04); }
+  .scene-particles::before, .scene-particles::after { animation: none; }
+  .btn.primary.xl::after { animation: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .mission, .dotty-ribbon, .instruction, .sys-btn, .mini-btn,
+  .panel-dialog .dialog-body, .briefing, .scene-card, .btn.secondary {
+    backdrop-filter: none !important;
+  }
+  .mission { background: var(--game-surface-strong); }
+  .dotty-ribbon { background: var(--game-surface-strong); }
+  .instruction { background: #0a2038; }
+  .sys-btn { background: #0a1c38; }
+  .mini-btn { background: #0a1c38; }
+  .scene::after { background: rgba(4,9,20,.8); }
+}
+
+@media (prefers-contrast: more) {
+  :root { --game-border: rgba(210,232,255,.6); --game-text-muted: #dae7f6; }
+  .scene::after { background: rgba(3,8,18,.82); }
+  .spot::before { border-color: rgba(220,238,255,.6); }
+  .btn.secondary, .btn.utility, .btn.ghost { border-color: rgba(220,238,255,.6); }
+  .status-message { color: #ffffff; }
+}
+
+/* If background images fail to load, the deep bg + text remain legible (no image dependency for function). */
+.scene { background: var(--game-bg-deep); }
