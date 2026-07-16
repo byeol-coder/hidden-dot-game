@@ -181,9 +181,9 @@
     </div>
     <p class="dialog-desc" id="tutorialDesc"></p>
     <div class="channel-grid">
-      <div class="channel"><b>화면</b><p id="tutorialVisual"></p></div>
-      <div class="channel"><b>촉각</b><p id="tutorialTactile"></p></div>
-      <div class="channel"><b>음성</b><p id="tutorialAudio"></p></div>
+      <div class="channel"><b id="tutorialVisualLabel">화면</b><p id="tutorialVisual"></p></div>
+      <div class="channel"><b id="tutorialTactileLabel">촉각</b><p id="tutorialTactile"></p></div>
+      <div class="channel"><b id="tutorialAudioLabel">음성</b><p id="tutorialAudio"></p></div>
     </div>
     <div class="tutorial-dots" id="tutorialDots" aria-hidden="true"></div>
     <div class="dialog-actions">
@@ -212,7 +212,7 @@
 <dialog id="completeDialog" aria-labelledby="completeTitle">
   <div class="dialog-body">
     <img class="result-art" src="assets/results/game-complete-starlight-tree.webp" alt="" aria-hidden="true" />
-    <div class="dialog-step">모든 빛을 찾았어요</div>
+    <div class="dialog-step" id="completeKicker">모든 빛을 찾았어요</div>
     <h2 class="dialog-title" id="completeTitle">별빛 나무가 다시 깨어났어요!</h2>
     <p class="dialog-desc" id="completeDesc">도티와 함께 다섯 개의 숨은 점을 모두 찾았어요. 천천히 만지고, 위치를 기억하고, 끝까지 확인한 멋진 탐험이었어요.</p>
     <div class="dialog-actions">

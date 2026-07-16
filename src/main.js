@@ -792,6 +792,18 @@ import { ACTION } from "./input/actions.js";
     $("#tactileTitle").textContent = "Tactile preview";
     $("#tactileDesc").textContent = "This is the 60 × 40 dot pattern sent to the DotPad. Bright dots are raised pins.";
     $("#closeTactileBtn").setAttribute("aria-label", "Close tactile preview");
+    $("#tutorialVisualLabel").textContent = "Screen";
+    $("#tutorialTactileLabel").textContent = "Tactile";
+    $("#tutorialAudioLabel").textContent = "Voice";
+    $("#tutorialPrevBtn").textContent = "Previous";
+    $("#tutorialReplayBtn").textContent = "🔊 Replay";
+    $("#closeTutorialBtn").setAttribute("aria-label", "Close tutorial");
+    $("#stageHomeBtn").textContent = "Home";
+    $("#completeKicker").textContent = "All lights found";
+    $("#completeTitle").textContent = "The starlight tree is awake again!";
+    $("#completeDesc").textContent = "You explored with Dotty and found all five hidden lights — touching slowly, remembering each spot, and checking every one. What a wonderful adventure.";
+    $("#completeHomeBtn").textContent = "Home";
+    $("#playAgainBtn").textContent = "Play again";
   }
 
   updateConnectionUI();
