@@ -117,6 +117,7 @@ import { ACTION } from "./input/actions.js";
     tutorialIndex: 0,
     soundOn: true,
     connected: false,
+    connecting: false,
     sdk: null,
     scanner: null,
     keyCodes: null,
@@ -233,16 +234,38 @@ import { ACTION } from "./input/actions.js";
     $("#progressMeter").style.width = `${Math.max(4, state.foundCount / STAGES.length * 100)}%`;
   }
 
+  const artCache = new Set();
+  function preloadArt(url) {
+    if (!url || artCache.has(url)) return;
+    artCache.add(url);
+    const img = new Image();
+    img.src = url;
+  }
+
+  let stageArtActiveIsA = true;
+  let currentStageArt = "";
+  function setStageArt(url) {
+    if (!url || url === currentStageArt) return; // skip redundant crossfades (e.g. re-render on blink)
+    currentStageArt = url;
+    preloadArt(url);
+    const incoming = stageArtActiveIsA ? $("#stageArtB") : $("#stageArtA");
+    const outgoing = stageArtActiveIsA ? $("#stageArtA") : $("#stageArtB");
+    incoming.src = url;
+    incoming.classList.add("is-active");
+    outgoing.classList.remove("is-active");
+    stageArtActiveIsA = !stageArtActiveIsA;
+  }
+
   function renderStage() {
     const stage = STAGES[state.stageIndex];
     const text = stageText(stage);
     $("#stageKicker").textContent = text[0];
     $("#stageTitle").textContent = text[1];
     $("#stageDesc").textContent = text[2];
-    // Use a real <img> for the full-scene background so the path resolves
-    // against the document (not styles/game.css). Keep the CSS var in sync for
-    // any legacy styling that still references it.
-    $("#stageArt").src = stage.art;
+    // Crossfade into the new stage's background and warm the next stage's
+    // art so advancing feels instant instead of popping in mid-download.
+    setStageArt(stage.art);
+    preloadArt(STAGES[state.stageIndex + 1]?.art);
     $("#boardShell").style.setProperty("--stage-art", `url(\"${stage.art}\")`);
     $("#instruction").textContent = currentLang === "en"
       ? "An ordinary stone has one center dot. The hidden light has five dots in a cross."
@@ -261,8 +284,9 @@ import { ACTION } from "./input/actions.js";
   function renderBoard() {
     const stage = STAGES[state.stageIndex];
     const board = $("#searchBoard");
-    board.style.gridTemplateColumns = `repeat(${stage.cols}, auto)`;
-    board.style.gridTemplateRows = `repeat(${stage.rows}, auto)`;
+    board.style.gridTemplateColumns = `repeat(${stage.cols}, minmax(0, 1fr))`;
+    board.style.gridTemplateRows = `repeat(${stage.rows}, minmax(0, 1fr))`;
+    board.style.setProperty("--board-ratio", `${stage.cols} / ${stage.rows}`);
     board.innerHTML = "";
     const total = stage.cols * stage.rows;
     for (let index = 0; index < total; index++) {
@@ -619,6 +643,7 @@ import { ACTION } from "./input/actions.js";
   }
 
   async function connectDotPad() {
+    if (state.connecting) return; // a request/pairing dialog is already in flight
     if (state.connected) {
       try { state.sdk?.disconnect(); } catch (_) {}
       state.connected = false; updateConnectionUI();
@@ -627,10 +652,15 @@ import { ACTION } from "./input/actions.js";
     if (!navigator.bluetooth || !window.isSecureContext) {
       setStatus(COPY.connectionFail, "error"); speak(COPY.connectionFail); return;
     }
-    const loaded = await loadSDK();
-    if (!loaded) { setStatus(COPY.sdkMissing, "error"); speak(COPY.sdkMissing); return; }
-    setStatus(COPY.connectionWait); speak(COPY.connectionWait);
+    state.connecting = true;
+    const connectBtn = $("#connectBtn");
+    connectBtn.classList.add("is-loading");
+    connectBtn.setAttribute("aria-busy", "true");
+    connectBtn.disabled = true;
     try {
+      const loaded = await loadSDK();
+      if (!loaded) { setStatus(COPY.sdkMissing, "error"); speak(COPY.sdkMissing); return; }
+      setStatus(COPY.connectionWait); speak(COPY.connectionWait);
       let device = null;
       try {
         device = await navigator.bluetooth.requestDevice({
@@ -645,6 +675,11 @@ import { ACTION } from "./input/actions.js";
     } catch (error) {
       console.error("[DotPad connect]", error);
       setStatus(COPY.connectionFail, "error"); speak(COPY.connectionFail);
+    } finally {
+      state.connecting = false;
+      connectBtn.classList.remove("is-loading");
+      connectBtn.removeAttribute("aria-busy");
+      connectBtn.disabled = false;
     }
   }
 
@@ -779,6 +814,18 @@ import { ACTION } from "./input/actions.js";
     $("#tactileTitle").textContent = "Tactile preview";
     $("#tactileDesc").textContent = "This is the 60 × 40 dot pattern sent to the DotPad. Bright dots are raised pins.";
     $("#closeTactileBtn").setAttribute("aria-label", "Close tactile preview");
+    $("#tutorialVisualLabel").textContent = "Screen";
+    $("#tutorialTactileLabel").textContent = "Tactile";
+    $("#tutorialAudioLabel").textContent = "Voice";
+    $("#tutorialPrevBtn").textContent = "Previous";
+    $("#tutorialReplayBtn").textContent = "🔊 Replay";
+    $("#closeTutorialBtn").setAttribute("aria-label", "Close tutorial");
+    $("#stageHomeBtn").textContent = "Home";
+    $("#completeKicker").textContent = "All lights found";
+    $("#completeTitle").textContent = "The starlight tree is awake again!";
+    $("#completeDesc").textContent = "You explored with Dotty and found all five hidden lights — touching slowly, remembering each spot, and checking every one. What a wonderful adventure.";
+    $("#completeHomeBtn").textContent = "Home";
+    $("#playAgainBtn").textContent = "Play again";
   }
 
   updateConnectionUI();
