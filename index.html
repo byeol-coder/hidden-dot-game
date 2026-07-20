@@ -24,6 +24,13 @@
        단독 배포(GitHub Pages 등)에서는 동봉된 TW_TTS 호환 tts.js가 음성을 제공합니다.
        defer: HTML 파싱을 막지 않으면서 module인 main.js보다 먼저 실행됩니다. -->
   <script defer src="./tts.js"></script>
+  <!-- Typography: Jua (rounded Korean display — the storybook voice of the game)
+       + Pretendard Variable for interface/reading. Both load with display=swap
+       and fall back to the same system stack, so offline/embed still works. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <link rel="preload" as="image" href="./assets/hero-banner-2560x900.jpg" fetchpriority="high" />
   <link rel="stylesheet" href="./styles/game.css" />
   <link rel="stylesheet" href="./styles/cinematic.css" />
@@ -86,41 +93,26 @@
     <!-- ============================ PLAY ============================ -->
     <section id="gameScreen" class="screen" aria-labelledby="stageTitle">
       <div class="stage" id="gameScene" data-stage="firefly-meadow">
-        <!-- Mission HUD: objective, progress and utility controls in one bar -->
-        <div class="mission">
-          <div class="mission-copy">
+        <!-- Stage header: where am I + journey progress -->
+        <header class="quest-head">
+          <div class="quest-head-row">
             <p class="stage-kicker" id="stageKicker">첫 번째 빛</p>
-            <h2 class="stage-title" id="stageTitle">반딧불 풀밭</h2>
-            <p class="stage-desc" id="stageDesc">네 개의 돌 가운데 숨어 있는 빛 점을 찾아보세요.</p>
+            <ul class="journey-progress" id="progressStars" aria-label="모은 빛 0개"></ul>
           </div>
-          <div class="mission-side">
-            <div class="progress-cluster">
-              <ul class="journey-progress" id="progressStars" aria-label="모은 빛 0개"></ul>
-            </div>
-            <div class="mission-tools">
-              <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.2 9a2.8 2.8 0 115.3 1.2c-.5 1-1.7 1.4-2.2 2.2-.2.3-.3.7-.3 1.1M12 17.5h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-                <span class="btn-label sr-only">조작 도움말</span>
-              </button>
-              <button class="icon-btn tactile-trigger" id="tactileBtn" type="button" aria-haspopup="dialog">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><circle cx="7" cy="7" r="1.6"/><circle cx="12" cy="7" r="1.6"/><circle cx="17" cy="7" r="1.6"/><circle cx="7" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="17" cy="12" r="1.6"/><circle cx="7" cy="17" r="1.6"/><circle cx="12" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></g></svg>
-                <span class="btn-label sr-only">촉각판 보기</span>
-              </button>
-            </div>
-          </div>
-        </div>
+          <h2 class="stage-title" id="stageTitle">반딧불 풀밭</h2>
+          <p class="stage-desc" id="stageDesc">네 개의 돌 가운데 숨어 있는 빛 점을 찾아보세요.</p>
+        </header>
 
-        <!-- Play area -->
+        <!-- Play area: the board owns the screen -->
         <div class="play">
-          <p class="instruction" id="instruction">보통 돌은 가운데 점 하나, 숨은 빛은 십자 모양 다섯 점입니다.</p>
           <div class="board-shell" id="boardShell">
             <div id="searchBoard" class="search-board" role="grid" aria-label="숨은 점 찾기 촉각 보드"></div>
           </div>
-          <p class="board-help" id="boardHelp">화살표로 선택 위치를 옮기고 Enter로 확인하세요. Space를 누르면 현재 위치를 들을 수 있어요.</p>
+          <p class="instruction" id="instruction">보통 돌은 가운데 점 하나, 숨은 빛은 십자 모양 다섯 점입니다.</p>
         </div>
 
-        <!-- Companion, status and actions live in one control panel -->
-        <div class="control-panel">
+        <!-- Quest panel: Dotty's guidance + actions + utilities in one column -->
+        <aside class="quest-panel" aria-label="도티 안내와 게임 조작">
           <div class="dotty-ribbon">
             <span class="dotty-avatar" aria-hidden="true"></span>
             <p id="statusMessage" class="status-message" role="status" aria-live="polite" aria-atomic="true">게임을 시작할 준비가 됐어요.</p>
@@ -147,7 +139,20 @@
               <kbd class="btn-key">R</kbd>
             </button>
           </div>
-        </div>
+          <div class="quest-foot">
+            <p class="board-help" id="boardHelp">화살표로 선택 위치를 옮기고 Enter로 확인하세요. Space를 누르면 현재 위치를 들을 수 있어요.</p>
+            <div class="mission-tools">
+              <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.2 9a2.8 2.8 0 115.3 1.2c-.5 1-1.7 1.4-2.2 2.2-.2.3-.3.7-.3 1.1M12 17.5h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                <span class="btn-label sr-only">조작 도움말</span>
+              </button>
+              <button class="icon-btn tactile-trigger" id="tactileBtn" type="button" aria-haspopup="dialog">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><circle cx="7" cy="7" r="1.6"/><circle cx="12" cy="7" r="1.6"/><circle cx="17" cy="7" r="1.6"/><circle cx="7" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="17" cy="12" r="1.6"/><circle cx="7" cy="17" r="1.6"/><circle cx="12" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></g></svg>
+                <span class="btn-label sr-only">촉각판 보기</span>
+              </button>
+            </div>
+          </div>
+        </aside>
       </div>
     </section>
   </main>

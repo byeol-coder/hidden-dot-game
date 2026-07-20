@@ -2,13 +2,9 @@
    responsive.css — breakpoints, embed, motion / a11y preferences
    ============================================================= */
 
-/* ---- Desktop: keep the play area within one viewport ---- */
-@media (min-width: 861px) {
-  .stage { max-width: 1220px; margin: 0 auto; }
-  /* cap board width so a landscape desktop keeps board + controls in one view,
-     while still letting the board be the largest element on screen */
-  .board-shell { width: min(900px, 84vh); }
-}
+/* ---- Desktop: board + quest panel side by side (layout lives in
+   cinematic.css). Nothing to cap here anymore — the board simply fills
+   its own column and the panel absorbs the chrome. ---- */
 
 /* ---- Tablet / small laptop ---- */
 @media (max-width: 1024px) {
@@ -26,6 +22,13 @@
   .hero-title { font-size: clamp(52px, 7.2vh, 78px); }
   .intro-lead { margin-top: clamp(14px, 2vh, 20px); }
   .intro-story { margin-top: 10px; line-height: 1.55; }
+  /* Play screen on short desktops: tighten the panel so the board keeps
+     its height — the whole point of the side-panel layout. */
+  .quest-head { padding: 12px 16px; }
+  .stage-desc { display: none; }
+  .action-bar .btn.act { min-height: 46px; }
+  .quest-panel { gap: 10px; }
+  .board-help { display: none; }
 }
 @media (max-height: 660px) and (min-width: 861px) {
   .intro-story { display: none; }
@@ -43,12 +46,26 @@
   .intro-actions { flex-direction: column; align-items: stretch; }
   .intro-actions .btn { width: 100%; }
 
-  .mission { flex-direction: column; gap: 12px; }
-  .mission-side { align-self: flex-start; flex-wrap: wrap; }
+  /* Play screen stacks in DOM order: stage header, board, quest panel */
+  .stage {
+    display: flex; flex-direction: column;
+    gap: 12px; max-width: 100%;
+  }
+  .quest-head { padding: 12px 15px; }
+  .stage-title { font-size: 22px; }
+  .board-shell { width: 100%; flex: 0 0 auto; container-type: normal; }
+  /* Width-driven board: every stage has cols >= rows, so height never
+     exceeds width — sizing from the full available width is always safe
+     in the vertical stack (the desktop cq-unit fit doesn't resolve in
+     this flex context, so it's switched off above). */
+  .search-board { height: auto; width: min(100%, 620px); }
+  .quest-panel { padding: 13px 14px; }
 
   .action-bar { grid-template-columns: 1fr 1fr; }
-  .action-bar .btn.act { flex-direction: column; gap: 5px; min-height: 66px; text-align: center; }
+  .action-bar .btn.act { flex-direction: column; justify-content: center; gap: 5px; min-height: 64px; text-align: center; }
   .action-bar .btn.act .btn-key { margin-inline-start: 0; }
+  .board-help { display: none; }
+  .quest-foot { justify-content: flex-end; border-top: 0; padding-top: 0; }
 
   .channel-row { grid-template-columns: 1fr; }
   .scene-card .result-art { aspect-ratio: 4 / 3; }
@@ -69,8 +86,7 @@
   .sys-btn .label { display: none; }          /* icons only, labels remain in aria/title */
   .sys-btn { padding: 8px 10px; }
   .search-board { gap: clamp(12px, 4.4vw, 22px); }
-  .spot { width: clamp(46px, 17vw, 70px); }
-  .instruction { font-size: 12.5px; }
+  .instruction { font-size: 12px; }
 }
 
 /* Keep an accessible name on icon-only header buttons at narrow widths.
@@ -111,12 +127,13 @@
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .mission, .control-panel, .sys-btn, .icon-btn, .mini-btn,
+  .quest-head, .quest-panel, .status-message, .sys-btn, .icon-btn, .mini-btn,
   .panel-dialog .dialog-body, .briefing, .scene-card, .btn.secondary {
     backdrop-filter: none !important;
   }
-  .mission { background: var(--game-surface-strong); }
-  .control-panel { background: var(--game-surface-strong); }
+  .quest-head { background: var(--game-surface-strong); }
+  .quest-panel { background: var(--game-surface-strong); }
+  .status-message { background: #0a1c38; }
   .sys-btn { background: #0a1c38; }
   .icon-btn { background: #0a1c38; }
   .mini-btn { background: #0a1c38; }
@@ -138,7 +155,7 @@
    Windows High Contrast / forced-colors
    ============================================================ */
 @media (forced-colors: active) {
-  .btn, .sys-btn, .mini-btn, .icon-btn, .spot::before, .mission, .control-panel,
+  .btn, .sys-btn, .mini-btn, .icon-btn, .spot::before, .quest-head, .quest-panel, .status-message,
   .panel-dialog .dialog-body, .briefing, .scene-card {
     forced-color-adjust: none;
     border: 1px solid CanvasText;

@@ -84,10 +84,11 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(38px, 5vw, 84px);
-  font-weight: 830;
+  font-weight: 400; /* Jua is single-weight; fallback stacks render bold via synthesis below */
+  font-synthesis-weight: none;
   font-stretch: 100%;
-  line-height: var(--leading-display);
-  letter-spacing: var(--tracking-display);
+  line-height: 1.06;
+  letter-spacing: -.015em;
   text-wrap: balance;
   color: var(--game-text);
   text-shadow: 0 3px 22px rgba(0,0,0,.68), 0 1px 3px rgba(0,0,0,.6);
@@ -134,50 +135,54 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
    PLAY — stage scene
    ============================================================ */
 #gameScreen { align-items: stretch; }
+/* Two-zone play layout: the board owns the left column at full height,
+   and everything that used to stack as three horizontal bands (mission
+   bar / control panel) now lives in one quiet column on the right —
+   stage header on top, Dotty + actions below it. The eye stays on the
+   board; orientation and controls sit in one predictable place. */
 .stage {
   flex: 1 1 auto; min-height: 0;
-  display: flex; flex-direction: column; gap: clamp(8px, 1.4vh, 16px);
-  width: 100%;
+  width: 100%; max-width: 1280px; margin: 0 auto;
+  display: grid;
+  grid-template-areas:
+    "board head"
+    "board panel";
+  grid-template-columns: minmax(0, 1fr) clamp(296px, 27vw, 364px);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(10px, 1.4vh, 14px) clamp(14px, 1.8vw, 22px);
 }
 
-/* Mission HUD */
-.mission {
-  flex: 0 0 auto;
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 18px;
-  padding: clamp(12px, 1.6vw, 18px) clamp(14px, 2vw, 22px);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(6,17,36,.62), rgba(6,15,32,.42));
-  border: 1px solid rgba(170,212,255,.16);
+/* Stage header — where am I + journey progress */
+.quest-head {
+  grid-area: head;
+  padding: clamp(14px, 1.8vh, 20px) clamp(16px, 1.6vw, 22px);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(8,20,42,.72), rgba(6,15,32,.56));
+  border: 1px solid rgba(170,212,255,.18);
   border-inline-start: 3px solid var(--accent);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
 }
-/* Hierarchy, rebalanced: the board is the actual thing being played and
-   should read as the largest element on screen. The mission bar is
-   orientation, not content, so within it: kicker (smallest) < objective
-   caption < stage name (the one thing worth a glance, "where am I").
-   The objective line already repeats near-verbatim in Dotty's status
-   message below, so it no longer needs to compete at headline size. */
+.quest-head-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-bottom: 6px;
+}
 .stage-kicker {
   font-family: var(--font-interface);
-  color: var(--accent); font-weight: 800; font-size: 13px; letter-spacing: .12em;
-  text-transform: uppercase; margin: 0 0 4px;
+  color: var(--accent); font-weight: 800; font-size: 12.5px; letter-spacing: .12em;
+  text-transform: uppercase; margin: 0;
 }
 .stage-title {
-  font-family: var(--font-interface);
-  font-size: clamp(20px, 2vw, 27px); font-weight: 820; letter-spacing: -.02em;
-  margin: 0 0 6px; color: var(--game-text);
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.1vw, 30px); font-weight: 400; letter-spacing: -.01em;
+  margin: 0 0 6px; color: var(--game-text); line-height: 1.14;
   text-shadow: 0 2px 14px rgba(0,0,0,.5);
 }
 .stage-desc {
   font-family: var(--font-interface);
-  color: var(--game-text-muted); line-height: 1.4; margin: 0; max-width: 42ch;
-  font-size: clamp(13px, 1.1vw, 15px); font-weight: 500; letter-spacing: -.005em;
+  color: var(--game-text-muted); line-height: 1.5; margin: 0;
+  font-size: clamp(13px, 1.05vw, 14.5px); font-weight: 500; letter-spacing: -.005em;
 }
 
-/* Mission-side cluster: progress + the two utility drawers (help / tactile
-   preview), grouped together on one side instead of the utility buttons
-   living in their own separate row at the bottom of the screen. */
-.mission-side { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
 .mission-tools { display: flex; gap: 8px; }
 .icon-btn {
   width: 40px; height: 40px; flex: 0 0 auto; border-radius: 12px; cursor: pointer;
@@ -190,7 +195,6 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 .icon-btn .ico { width: 19px; height: 19px; }
 
 /* Journey progress */
-.progress-cluster { display: flex; align-items: center; flex-shrink: 0; }
 .journey-progress {
   display: flex;
   align-items: center;
@@ -229,24 +233,25 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 .journey-dot:focus-visible { outline: 4px solid #9defff; outline-offset: 4px; }
 @media (max-width: 480px) { .journey-dot { --dot-size: 46px; --core-size: 20px; } .journey-progress { gap: 11px; } }
 
-/* Compact scale for the mission-bar instance — the result dialogs' journey
+/* Compact scale for the in-game header instance — the result dialogs' journey
    progress is a large celebratory moment; the same indicator here is a quiet,
    persistent status, so it reads at a smaller, secondary scale (wins over the
    phone-width rule above since it targets .journey-dot directly). */
-.mission .journey-dot { --dot-size: clamp(26px, 2vw, 32px); --core-size: clamp(10px, .9vw, 13px); }
-.mission .journey-progress { gap: clamp(7px, 1vw, 10px); }
+.quest-head .journey-dot { --dot-size: clamp(24px, 1.9vw, 30px); --core-size: clamp(9px, .85vw, 12px); }
+.quest-head .journey-progress { gap: clamp(6px, .9vw, 9px); }
 
-/* Play area — centers the board and grows to fill */
+/* Play zone — the board owns the whole left column */
 .play {
-  flex: 1 1 auto; min-height: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  grid-area: board;
+  min-height: 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center;
   gap: 10px;
 }
 /* Plain caption, not its own pill/card — reads as a label on the board
-   below it rather than one more floating panel competing for attention. */
+   above it rather than one more floating panel competing for attention. */
 .instruction {
   flex: 0 0 auto; text-align: center; max-width: 60ch; margin: 0;
-  color: #eafcff; font-weight: 700; font-size: clamp(13px, 1.5vw, 15px); line-height: 1.5;
+  color: #dcefff; font-weight: 600; font-size: clamp(12.5px, 1.1vw, 14px); line-height: 1.5;
   text-shadow: 0 2px 10px rgba(0,0,0,.7);
 }
 
@@ -256,9 +261,9 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
      heaviest element on the play screen, not a middling middle panel
      between two chrome bars. */
   flex: 1 1 auto; min-height: 0;
-  position: relative; width: min(900px, 100%);
+  position: relative; width: 100%;
   display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); place-items: center;
-  padding: clamp(14px, 2.4vw, 30px);
+  padding: clamp(16px, 2.6vw, 34px);
   border-radius: var(--game-radius-scene);
   background:
     radial-gradient(120% 100% at 50% 40%, rgba(8,22,42,.34), rgba(4,12,26,.72) 78%);
@@ -278,11 +283,22 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
      derived from the ratio and capped so a wide board never overflows. */
   height: 100%; width: auto;
   aspect-ratio: var(--board-ratio, 1);
-  max-width: min(720px, 100%);
+  max-width: 100%; max-height: 100%;
   display: grid;
-  gap: clamp(8px, 2.2vw, 34px);
+  gap: clamp(10px, 2.4vw, 38px);
   place-items: center;
   position: relative; z-index: 2;
+}
+/* Exact fit on both axes: with container-query units the board takes the
+   largest size that keeps cells square inside the shell's content box,
+   whichever axis is the constraint (wide 5x4 boards vs tall shells).
+   The height:100% rule above remains as the legacy fallback. */
+@supports (width: 1cqw) {
+  .board-shell { container-type: size; }
+  .search-board {
+    height: auto;
+    width: min(100cqw, calc(100cqh * var(--board-ratio, 1)));
+  }
 }
 
 /* role="row" wrapper around each line of stones: display:contents removes
@@ -294,7 +310,7 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 /* Individual stone / spot — fills its grid cell so boards with more
    rows/columns shrink to fit instead of overflowing the shell. */
 .spot {
-  width: 100%; height: 100%; max-width: 132px; max-height: 132px;
+  width: 100%; height: 100%; max-width: 150px; max-height: 150px;
   border: 0; background: none; padding: 0; position: relative;
   display: grid; place-items: center; cursor: pointer; border-radius: 26%;
   transition: transform .18s ease;
@@ -361,24 +377,28 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
   80% { transform: translateX(2px); }
 }
 
-.board-help { flex: 0 0 auto; margin: 0; color: var(--game-text-muted); font-size: 12.5px; text-align: center; line-height: 1.5; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
-
-/* Control panel: companion status and the primary action buttons share
-   one card instead of stacking as two separate floating panels. */
-.control-panel {
-  flex: 0 0 auto;
-  display: flex; flex-direction: column; gap: 12px;
-  padding: 14px 18px 16px; border-radius: 18px;
+/* Quest panel: Dotty's live guidance, the four play actions, and the two
+   utility drawers, in one column card beside the board — instead of a
+   full-width band pushed to the bottom of the screen, far from the play. */
+.quest-panel {
+  grid-area: panel;
+  align-self: start; /* hug content — no stretched card with a void between actions and footer */
+  min-height: 0; max-height: 100%;
+  display: flex; flex-direction: column; gap: clamp(12px, 1.8vh, 16px);
+  padding: clamp(14px, 1.8vh, 18px) clamp(14px, 1.5vw, 18px);
+  border-radius: 20px;
   background: linear-gradient(180deg, rgba(11,31,56,.78), rgba(8,20,42,.6));
   border: 1px solid rgba(150,210,255,.24);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
   box-shadow: var(--game-shadow-control);
 }
 
-/* Dotty companion status row */
-.dotty-ribbon { flex: 0 0 auto; display: flex; align-items: center; gap: 13px; }
+/* Dotty companion — avatar + speech bubble, so the status reads as the
+   guide friend actually talking, right next to where the player acts. */
+.dotty-ribbon { flex: 0 0 auto; display: flex; align-items: flex-start; gap: 11px; }
 .dotty-avatar {
-  width: 42px; height: 42px; flex: 0 0 auto; border-radius: 50%;
+  width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%;
+  margin-top: 4px;
   background:
     radial-gradient(circle at 34% 30%, #dbfcff, #74e6ff 44%, #17a3dd 100%);
   box-shadow: 0 0 18px rgba(90,220,255,.55), inset 0 0 8px rgba(255,255,255,.4);
@@ -391,22 +411,38 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 .dotty-avatar::after { right: 32%; }
 .status-message {
   font-family: var(--font-interface);
-  margin: 0; color: #f6fbff; line-height: 1.5; font-weight: 700; font-size: clamp(14px, 1.7vw, 16px);
-  min-height: calc(1.5em * 2); display: flex; align-items: center;
+  position: relative;
+  margin: 0; flex: 1 1 auto;
+  padding: 11px 13px;
+  border-radius: 4px 14px 14px 14px;
+  background: rgba(120, 200, 255, .1);
+  border: 1px solid rgba(150, 214, 255, .22);
+  color: #f6fbff; line-height: 1.5; font-weight: 650; font-size: clamp(13.5px, 1.1vw, 15px);
+  min-height: calc(1.5em * 2 + 22px); display: flex; align-items: center;
 }
-.status-message.success { color: #fff2ad; }
-.status-message.error { color: #ffd7d7; }
+.status-message.success { color: #fff2ad; border-color: rgba(255,224,136,.4); background: rgba(255,214,106,.1); }
+.status-message.error { color: #ffd7d7; border-color: rgba(255,170,170,.35); background: rgba(255,140,140,.08); }
 /* success/error also carry an icon marker so state is not colour-only */
-.status-message.success::before { content: "✦ "; color: var(--game-gold); }
-.status-message.error::before { content: "› "; color: var(--game-cyan); }
+.status-message.success::before { content: "✦ "; color: var(--game-gold); margin-right: 2px; }
+.status-message.error::before { content: "› "; color: var(--game-cyan); margin-right: 2px; }
 
-/* Context action bar */
+/* Play actions — stacked, importance top to bottom, key hints aligned right */
 .action-bar {
   flex: 0 0 auto;
-  display: grid; grid-template-columns: 1.5fr 1.2fr 1fr 1fr; gap: 10px;
+  display: grid; grid-template-columns: 1fr; gap: 8px;
 }
-.action-bar .btn.act { flex-direction: row; min-height: 54px; padding: 10px 14px; }
+.action-bar .btn.act { flex-direction: row; justify-content: flex-start; min-height: 52px; padding: 10px 15px; text-align: left; }
 .action-bar .btn.act .btn-key { margin-inline-start: auto; }
+
+/* Panel footer — the keyboard one-liner and the two utility drawers,
+   pinned to the bottom of the column behind a quiet divider. */
+.quest-foot {
+  margin-top: auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding-top: clamp(10px, 1.6vh, 14px);
+  border-top: 1px solid rgba(160,210,255,.16);
+}
+.board-help { flex: 1 1 auto; margin: 0; color: var(--game-text-muted); font-size: 12px; text-align: left; line-height: 1.5; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
 
 /* ============================================================
    Per-stage accents + scene focus
@@ -428,16 +464,17 @@ dialog::backdrop { background: rgba(2, 7, 16, .74); backdrop-filter: blur(6px); 
 .dialog-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
 .dialog-step { color: var(--game-cyan); font-size: 12.5px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 8px; }
 .dialog-title {
-  font-family: var(--font-interface);
-  font-size: clamp(24px, 4vw, 38px); font-weight: 800; letter-spacing: -.04em; margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 4vw, 38px); font-weight: 400; letter-spacing: -.01em; margin: 0 0 10px;
+  line-height: 1.16;
 }
-.dialog-title.sm { font-size: clamp(19px, 2.6vw, 24px); margin: 0; }
+.dialog-title.sm { font-family: var(--font-interface); font-weight: 800; letter-spacing: -.03em; font-size: clamp(19px, 2.6vw, 24px); margin: 0; }
 .dialog-desc { color: #e7f1ff; line-height: 1.65; font-size: 15.5px; margin: 0; }
 /* Result scenes (stage-clear / ending): the emotional payoff line is
    the strongest text on screen, stronger than any dialog elsewhere. */
 .scene-card-body .dialog-title {
   font-family: var(--font-display);
-  font-size: clamp(34px, 4.6vw, 56px); font-weight: 850; line-height: 1.04; letter-spacing: -.04em;
+  font-size: clamp(34px, 4.6vw, 56px); font-weight: 400; line-height: 1.12; letter-spacing: -.01em;
   text-wrap: balance;
 }
 .scene-card-body .dialog-desc {
