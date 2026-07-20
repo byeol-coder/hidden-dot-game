@@ -267,8 +267,9 @@
   </div>
 </dialog>
 
-<div id="liveRegion" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-<div id="assertiveRegion" class="sr-only" role="alert" aria-live="assertive" aria-atomic="true"></div>
+<!-- Single hidden SR announcer: politeness level is toggled in JS (live()) instead of
+     keeping two separate live regions, which previously caused duplicate announcements. -->
+<div id="srAnnouncer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script type="module" src="./src/main.js"></script>
 </body>

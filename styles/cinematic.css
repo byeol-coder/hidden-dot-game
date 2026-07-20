@@ -259,6 +259,12 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
   position: relative; z-index: 2;
 }
 
+/* role="row" wrapper around each line of stones: display:contents removes
+   it from the box-generation tree so the buttons still participate
+   directly in #searchBoard's CSS Grid, while the DOM keeps the
+   grid > row > gridcell structure screen readers expect. */
+.board-row { display: contents; }
+
 /* Individual stone / spot — fills its grid cell so boards with more
    rows/columns shrink to fit instead of overflowing the shell. */
 .spot {

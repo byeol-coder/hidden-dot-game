@@ -127,11 +127,13 @@ import { ACTION } from "./input/actions.js";
     dataCodes: null,
     blinkOn: true,
     sentHex: "",
-    stageComplete: false
+    stageComplete: false,
+    runSeed: 0
   };
 
   function live(message, assertive = false) {
-    const el = assertive ? $("#assertiveRegion") : $("#liveRegion");
+    const el = $("#srAnnouncer");
+    el.setAttribute("aria-live", assertive ? "assertive" : "polite");
     el.textContent = "";
     setTimeout(() => { el.textContent = message; }, 25);
   }
@@ -184,7 +186,7 @@ import { ACTION } from "./input/actions.js";
 
   function seededTarget(stageIndex, total) {
     if (stageIndex === 0) return total - 1; // 안내형 첫 판: 오른쪽 아래
-    const seed = ((Date.now() / 86400000) | 0) + stageIndex * 17 + state.foundCount * 7;
+    const seed = state.runSeed + stageIndex * 17 + state.foundCount * 7;
     return Math.abs((seed * 9301 + 49297) % 233280) % total;
   }
 
@@ -228,6 +230,7 @@ import { ACTION } from "./input/actions.js";
     if (resetAll) {
       state.stageIndex = 0;
       state.foundCount = 0;
+      state.runSeed = Math.floor(Math.random() * 1e6);
     }
     state.wrongAttempts = 0;
     state.stageComplete = false;
@@ -241,14 +244,20 @@ import { ACTION } from "./input/actions.js";
       ? `${text[1]}. ${text[2]} One center dot is ordinary. Five dots in a cross are the hidden light.`
       : `${text[1]}입니다. ${text[2]} 가운데 한 점은 보통 돌이고, 십자 모양 다섯 점은 숨은 빛이에요.`;
     setStatus(intro);
-    speak(intro);
+    speak(intro, { skipAnnounce: true });
   }
 
-  function setStatus(message, type = "") {
+  function setStatus(message, type = "", assertive = false) {
     const el = $("#statusMessage");
-    el.textContent = message;
+    // #statusMessage already carries aria-live/role="status", so updating its
+    // text is itself an SR announcement. We no longer duplicate the same
+    // sentence into the hidden #srAnnouncer here (see speak()'s skipAnnounce).
+    el.textContent = "";
     el.className = `status-message${type ? ` ${type}` : ""}`;
-    live(message);
+    requestAnimationFrame(() => {
+      el.setAttribute("aria-live", assertive ? "assertive" : "polite");
+      el.textContent = message;
+    });
   }
 
   function fillLights(wrap, count, justWonIndex = -1) {
@@ -289,6 +298,10 @@ import { ACTION } from "./input/actions.js";
     renderBoard();
     renderTechnicalPreview();
     sendFrame();
+    // Move real DOM focus onto the active cell so Tab/keyboard/screen-reader
+    // focus tracks the same position as the tactile + audio cursor, instead
+    // of only living in component state.
+    requestAnimationFrame(() => $(".spot.selected")?.focus({ preventScroll: true }));
   }
 
   function spotPattern(isTarget) {
@@ -303,15 +316,30 @@ import { ACTION } from "./input/actions.js";
     board.style.gridTemplateRows = `repeat(${stage.rows}, minmax(0, 1fr))`;
     board.innerHTML = "";
     const total = stage.cols * stage.rows;
+    let rowWrap = null;
     for (let index = 0; index < total; index++) {
       const row = Math.floor(index / stage.cols);
       const col = index % stage.cols;
+      if (col === 0) {
+        // role="row" wrapper so the board matches the ARIA grid > row >
+        // gridcell structure; `display: contents` (styles/cinematic.css)
+        // keeps the existing CSS Grid track layout unaffected.
+        rowWrap = document.createElement("div");
+        rowWrap.className = "board-row";
+        rowWrap.setAttribute("role", "row");
+        board.appendChild(rowWrap);
+      }
       const isTarget = index === state.targetIndex;
+      const isSelected = index === state.cursorIndex;
       const button = document.createElement("button");
       button.type = "button";
-      button.className = `spot${index === state.cursorIndex ? " selected" : ""}${state.stageComplete && isTarget ? " found" : ""}`;
+      button.className = `spot${isSelected ? " selected" : ""}${state.stageComplete && isTarget ? " found" : ""}`;
       button.setAttribute("role", "gridcell");
-      button.setAttribute("aria-selected", String(index === state.cursorIndex));
+      button.setAttribute("aria-selected", String(isSelected));
+      // Roving tabindex: only the cursor cell is tabbable, matching the
+      // ARIA Authoring Practices composite-widget pattern and keeping Tab
+      // from stepping through all 4-20 stones one at a time.
+      button.tabIndex = isSelected ? 0 : -1;
       button.setAttribute("aria-label", currentLang === "en" ? `Row ${row + 1}, column ${col + 1}` : `${row + 1}행 ${col + 1}열`);
       button.dataset.index = String(index);
       button.innerHTML = `<span class="pin-pattern${isTarget ? " target-pattern" : ""}" aria-hidden="true">${spotPattern(isTarget)}</span>`;
@@ -319,9 +347,10 @@ import { ACTION } from "./input/actions.js";
         state.cursorIndex = index;
         renderBoard(); renderTechnicalPreview(); sendFrame();
         readCurrent(false);
+        $(".spot.selected")?.focus({ preventScroll: true });
       });
       button.addEventListener("dblclick", checkCurrent);
-      board.appendChild(button);
+      rowWrap.appendChild(button);
     }
   }
 
@@ -354,6 +383,7 @@ import { ACTION } from "./input/actions.js";
     tone("move");
     renderBoard(); renderTechnicalPreview(); sendFrame();
     readCurrent(false);
+    $(".spot.selected")?.focus({ preventScroll: true });
   }
 
   function coordinates(index) {
@@ -365,7 +395,7 @@ import { ACTION } from "./input/actions.js";
     const { row, col } = coordinates(state.cursorIndex);
     const message = COPY.current(row + 1, col + 1);
     setStatus(message);
-    if (voice) speak(message);
+    if (voice) speak(message, { skipAnnounce: true });
   }
 
   function directionHint() {
@@ -390,7 +420,7 @@ import { ACTION } from "./input/actions.js";
     else message = directionHint();
     tone("hint");
     setStatus(message);
-    speak(message);
+    speak(message, { skipAnnounce: true });
   }
 
   async function checkCurrent() {
@@ -404,8 +434,8 @@ import { ACTION } from "./input/actions.js";
       const stage = STAGES[state.stageIndex];
       const text = stageText(stage);
       const message = `${COPY.found} ${storyText(stage)}`;
-      setStatus(message, "success");
-      speak(message, { assertive: true });
+      setStatus(message, "success", true);
+      speak(message, { skipAnnounce: true });
       setTimeout(() => openStageDialog(), 650);
       return;
     }
@@ -414,7 +444,7 @@ import { ACTION } from "./input/actions.js";
     flashWrongSpot();
     const message = `${COPY.miss} ${state.wrongAttempts >= 2 ? exactHint() : directionHint()}`;
     setStatus(message, "error");
-    speak(message);
+    speak(message, { skipAnnounce: true });
   }
 
   function readOverview() {
@@ -423,7 +453,7 @@ import { ACTION } from "./input/actions.js";
     const text = stageText(stage);
     const message = COPY.overview(text[1], stage.rows, stage.cols, state.foundCount);
     setStatus(message);
-    speak(message);
+    speak(message, { skipAnnounce: true });
   }
 
   function restartStage() {
@@ -435,7 +465,7 @@ import { ACTION } from "./input/actions.js";
     state.cursorIndex = 0;
     renderStage();
     const message = currentLang === "en" ? "This stage has restarted. Explore from the first stone." : "이 단계를 다시 시작했어요. 첫 번째 돌부터 천천히 찾아보세요.";
-    setStatus(message); speak(message);
+    setStatus(message); speak(message, { skipAnnounce: true });
   }
 
   function openStageDialog() {
@@ -468,10 +498,9 @@ import { ACTION } from "./input/actions.js";
     state.targetIndex = seededTarget(state.stageIndex, stage.cols * stage.rows);
     state.cursorIndex = 0;
     renderStage();
-    requestAnimationFrame(() => document.querySelector(".spot.selected")?.focus());
     const text = stageText(stage);
     const message = `${text[1]}. ${text[2]}`;
-    setStatus(message); speak(message);
+    setStatus(message); speak(message, { skipAnnounce: true });
   }
 
   function openCompleteDialog() {
@@ -639,7 +668,7 @@ import { ACTION } from "./input/actions.js";
       return;
     }
     if (!navigator.bluetooth || !window.isSecureContext) {
-      setStatus(COPY.connectionFail, "error"); speak(COPY.connectionFail); return;
+      setStatus(COPY.connectionFail, "error"); speak(COPY.connectionFail, { skipAnnounce: true }); return;
     }
     state.connecting = true;
     const connectBtn = $("#connectBtn");
@@ -648,8 +677,8 @@ import { ACTION } from "./input/actions.js";
     connectBtn.disabled = true;
     try {
       const loaded = await loadSDK();
-      if (!loaded) { setStatus(COPY.sdkMissing, "error"); speak(COPY.sdkMissing); return; }
-      setStatus(COPY.connectionWait); speak(COPY.connectionWait);
+      if (!loaded) { setStatus(COPY.sdkMissing, "error"); speak(COPY.sdkMissing, { skipAnnounce: true }); return; }
+      setStatus(COPY.connectionWait); speak(COPY.connectionWait, { skipAnnounce: true });
       let device = null;
       try {
         device = await navigator.bluetooth.requestDevice({
@@ -663,7 +692,7 @@ import { ACTION } from "./input/actions.js";
       if (device) await state.sdk.connectBleDevice(device);
     } catch (error) {
       console.error("[DotPad connect]", error);
-      setStatus(COPY.connectionFail, "error"); speak(COPY.connectionFail);
+      setStatus(COPY.connectionFail, "error"); speak(COPY.connectionFail, { skipAnnounce: true });
     } finally {
       state.connecting = false;
       connectBtn.classList.remove("is-loading");

@@ -1,7 +1,10 @@
 export function createTtsAdapter({ getLanguage, isEnabled, announce }) {
   return {
     speak(text, options = {}) {
-      announce?.(text, Boolean(options.assertive));
+      // Callers that already pushed this exact text into a visible aria-live
+      // element (see setStatus in main.js) pass skipAnnounce so the hidden
+      // SR announcer does not repeat the same sentence a second time.
+      if (!options.skipAnnounce) announce?.(text, Boolean(options.assertive));
       if (!isEnabled() || !window.TW_TTS) return;
       try {
         window.TW_TTS.setLang?.(getLanguage());
