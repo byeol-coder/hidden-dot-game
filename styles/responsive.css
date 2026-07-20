@@ -43,7 +43,7 @@
   .intro-actions .btn { width: 100%; }
 
   .mission { flex-direction: column; gap: 12px; }
-  .lights { align-self: flex-start; }
+  .journey-progress { align-self: flex-start; }
 
   .action-bar { grid-template-columns: 1fr 1fr; }
   .action-bar .btn.act { flex-direction: column; gap: 5px; min-height: 66px; text-align: center; }

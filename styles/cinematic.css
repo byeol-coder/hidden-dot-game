@@ -170,31 +170,52 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
   text-wrap: balance;
 }
 
-/* Light slots (progress) */
-.lights { display: flex; gap: 8px; flex-shrink: 0; }
-.lights .progress-star {
-  width: 26px; height: 26px; display: inline-grid; place-items: center;
-  border-radius: 50%; font-size: 0; position: relative;
-  background: rgba(255,255,255,.06); border: 1.5px solid rgba(180,215,255,.28);
-  transition: background .4s ease, box-shadow .4s ease, border-color .4s ease;
+/* Journey progress */
+.progress-cluster { display: flex; align-items: center; flex-shrink: 0; }
+.journey-progress {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: clamp(12px, 1.4vw, 18px);
+  width: max-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-.lights .progress-star::before {
-  content: ""; width: 10px; height: 10px; border-radius: 50%;
-  background: rgba(200,220,245,.3); transition: background .4s ease, box-shadow .4s ease;
+.journey-progress__item { display: grid; place-items: center; flex: 0 0 auto; }
+.journey-dot {
+  --dot-size: clamp(48px, 4vw, 56px);
+  --core-size: clamp(20px, 1.8vw, 24px);
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  inline-size: var(--dot-size);
+  block-size: var(--dot-size);
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 2px solid rgba(156, 199, 234, 0.42);
+  border-radius: 50%;
+  background: rgba(32, 63, 96, 0.64);
+  line-height: 0;
 }
-.lights .progress-star.on {
-  border-color: rgba(255,224,140,.85);
-  background: radial-gradient(circle at 40% 35%, rgba(255,240,190,.4), rgba(255,180,70,.12));
-  box-shadow: 0 0 16px rgba(255,196,90,.6);
-}
-.lights .progress-star.on::before { background: #ffdf87; box-shadow: 0 0 12px rgba(255,214,106,.95); }
-.lights.lights-lg .progress-star { width: 34px; height: 34px; }
-.lights.lights-lg .progress-star::before { width: 14px; height: 14px; }
+.journey-dot__core { display: block; inline-size: var(--core-size); block-size: var(--core-size); aspect-ratio: 1; margin: 0; border-radius: 50%; background: #5f7895; }
+.journey-dot.is-complete { border-color: #ffe183; }
+.journey-dot.is-complete .journey-dot__core { background: #ffe183; }
+.journey-dot.is-complete::before { content: ""; position: absolute; z-index: -1; inset: -9px; border-radius: inherit; background: radial-gradient(circle, rgba(255, 222, 122, 0.3), rgba(255, 222, 122, 0.08) 54%, transparent 74%); pointer-events: none; }
+.journey-dot:focus-visible { outline: 4px solid #9defff; outline-offset: 4px; }
+@media (max-width: 480px) { .journey-dot { --dot-size: 46px; --core-size: 20px; } .journey-progress { gap: 11px; } }
 
-/* progress cluster (light slots + thin meter) */
-.progress-cluster { display: flex; flex-direction: column; gap: 9px; align-items: flex-end; flex-shrink: 0; }
-.progress-track { width: 128px; max-width: 40vw; height: 6px; border-radius: 999px; background: rgba(255,255,255,.1); overflow: hidden; }
-.progress-fill { display: block; height: 100%; width: 20%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--game-gold)); transition: width .4s ease; }
+/* Compact scale for the mission-bar instance — the result dialogs' journey
+   progress is a large celebratory moment; the same indicator here is a quiet,
+   persistent status, so it reads at a smaller, secondary scale (wins over the
+   phone-width rule above since it targets .journey-dot directly). */
+.mission .journey-dot { --dot-size: clamp(26px, 2vw, 32px); --core-size: clamp(10px, .9vw, 13px); }
+.mission .journey-progress { gap: clamp(7px, 1vw, 10px); }
 
 /* Play area — centers the board and grows to fill */
 .play {
@@ -291,6 +312,20 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 }
 .spot.found .pin { background: #fff3c8; box-shadow: 0 0 16px rgba(255,236,160,.95); }
 @keyframes foundBloom { 0% { transform: scale(1); } 55% { transform: scale(1.16); } 100% { transform: scale(1.08); } }
+
+/* Wrong guess — a brief shake + soft red tint on the checked stone, paired
+   with the status/TTS feedback so sighted companions get the same beat
+   (motion + tint, not colour alone; respects prefers-reduced-motion via the
+   global animation-duration override in responsive.css). */
+.spot.wrong::before { border-color: rgba(255,156,156,.75); }
+.spot.wrong { animation: spotShake .36s ease; }
+@keyframes spotShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
 
 .board-help { flex: 0 0 auto; margin: 0; color: var(--game-text-muted); font-size: 12.5px; text-align: center; line-height: 1.5; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
 
@@ -449,7 +484,7 @@ dialog::backdrop { background: rgba(2, 7, 16, .74); backdrop-filter: blur(6px); 
 /* Progress lights and the "what's next" line read as one small cluster,
    set apart from the title/description above and the buttons below by
    unequal spacing rather than one repeated margin. */
-.scene-card-body .lights { margin: 22px 0 8px; }
+.scene-card-body .journey-progress { margin: 22px 0 8px; }
 .scene-next {
   display: inline-flex; align-items: center; gap: 7px;
   color: var(--game-cyan); font-weight: 700; font-size: 14px; letter-spacing: -.01em;
@@ -459,7 +494,7 @@ dialog::backdrop { background: rgba(2, 7, 16, .74); backdrop-filter: blur(6px); 
 .scene-next-ico { width: 15px; height: 15px; flex: 0 0 auto; }
 .scene-dialog.ending .scene-card { border-color: rgba(255,214,106,.45); }
 .scene-dialog.ending .scene-card-body { text-align: center; }
-.scene-dialog.ending .lights { justify-content: center; }
+.scene-dialog.ending .journey-progress { justify-content: center; }
 .scene-dialog.ending .dialog-actions { justify-content: center; }
 
 /* The "next adventure" action is the single dominant choice on this
@@ -477,7 +512,7 @@ dialog::backdrop { background: rgba(2, 7, 16, .74); backdrop-filter: blur(6px); 
   55% { transform: scale(1.22); box-shadow: 0 0 26px rgba(255,196,90,.85); }
   100% { transform: scale(1); box-shadow: 0 0 16px rgba(255,196,90,.6); }
 }
-.lights .progress-star.on.just-won { animation: lightWon .7s cubic-bezier(.25,.8,.4,1) both; }
+.journey-dot.is-complete.just-won { animation: lightWon .7s cubic-bezier(.25,.8,.4,1) both; }
 
 /* gentle bloom for ending (reduced-motion safe) */
 .scene-dialog.ending .result-art { animation: endingGlow 2.4s ease both; }

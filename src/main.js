@@ -254,19 +254,23 @@ import { ACTION } from "./input/actions.js";
   function fillLights(wrap, count, justWonIndex = -1) {
     wrap.innerHTML = "";
     for (let i = 0; i < STAGES.length; i++) {
-      const span = document.createElement("span");
-      span.className = `progress-star${i < count ? " on" : ""}${i === justWonIndex ? " just-won" : ""}`;
-      span.textContent = "★";
-      span.setAttribute("aria-hidden", "true");
-      wrap.appendChild(span);
+      const item = document.createElement("li");
+      item.className = "journey-progress__item";
+      item.innerHTML = `<span class="journey-dot${i < count ? " is-complete" : ""}${i === justWonIndex ? " just-won" : ""}" aria-hidden="true"><span class="journey-dot__core"></span></span>`;
+      wrap.appendChild(item);
     }
   }
 
   function renderProgress() {
     const wrap = $("#progressStars");
-    fillLights(wrap, state.foundCount);
+    wrap.innerHTML = "";
+    for (let i = 0; i < STAGES.length; i++) {
+      const item = document.createElement("li");
+      item.className = "journey-progress__item";
+      item.innerHTML = `<span class="journey-dot${i < state.foundCount ? " is-complete" : ""}" aria-hidden="true"><span class="journey-dot__core"></span></span>`;
+      wrap.appendChild(item);
+    }
     wrap.setAttribute("aria-label", currentLang === "en" ? `${state.foundCount} of 5 lights collected` : `빛 ${state.foundCount}개 모음`);
-    $("#progressMeter").style.width = `${Math.max(4, state.foundCount / STAGES.length * 100)}%`;
   }
 
   function renderStage() {
@@ -319,6 +323,18 @@ import { ACTION } from "./input/actions.js";
       button.addEventListener("dblclick", checkCurrent);
       board.appendChild(button);
     }
+  }
+
+  // Purely visual companion to the audio/status "miss" feedback above —
+  // a brief shake + red tint on the checked stone so a sighted companion
+  // gets the same beat. Does not touch game state or judging logic.
+  function flashWrongSpot() {
+    const el = document.querySelector(".spot.selected");
+    if (!el) return;
+    el.classList.remove("wrong");
+    void el.offsetWidth; // restart the animation if it fires again quickly
+    el.classList.add("wrong");
+    el.addEventListener("animationend", () => el.classList.remove("wrong"), { once: true });
   }
 
   function moveCursor(dx, dy) {
@@ -395,6 +411,7 @@ import { ACTION } from "./input/actions.js";
     }
     state.wrongAttempts += 1;
     tone("miss");
+    flashWrongSpot();
     const message = `${COPY.miss} ${state.wrongAttempts >= 2 ? exactHint() : directionHint()}`;
     setStatus(message, "error");
     speak(message);
