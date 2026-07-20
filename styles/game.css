@@ -38,6 +38,33 @@
   --scene-position-mobile: 74% 42%;
   --scene-overlay-strength: .62;
 
+  /* --- typography tiers ---
+     No web font is bundled or loaded in this project (checked: no
+     @font-face, no font files, no CDN link), so "Display/Interface/
+     Reading" are differentiated by weight/tracking/leading/size, not
+     by different typefaces. All three fall back through the same
+     safe, always-available system stack. */
+  --font-display: Pretendard, "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-interface: Pretendard, "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-reading: Pretendard, "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --game-text-secondary: var(--game-text-muted);
+  --game-text-tertiary: rgba(197, 214, 234, .68);
+
+  --text-display-xl: clamp(58px, 8vw, 108px);
+  --text-display-lg: clamp(44px, 5vw, 80px);
+  --text-heading-lg: clamp(26px, 2.2vw, 36px);
+  --text-heading-md: clamp(20px, 1.6vw, 28px);
+  --text-body-lg: clamp(17px, 1.15vw, 20px);
+  --text-body-md: clamp(15px, 1vw, 18px);
+  --text-caption: clamp(13px, .86vw, 15px);
+  --tracking-display: -.055em;
+  --tracking-heading: -.03em;
+  --tracking-body: -.015em;
+  --tracking-label: .04em;
+  --leading-display: .92;
+  --leading-heading: 1.3;
+  --leading-body: 1.65;
+
   font-family: Pretendard, "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 

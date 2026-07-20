@@ -15,15 +15,30 @@
   .briefing-art { min-height: 150px; }
 }
 
+/* ---- Desktop / laptop: short viewports (e.g. 1366x768) ----
+   Width-only breakpoints miss this case: shrink vertical rhythm and
+   the title before anything gets cramped or the story text crowds
+   the CTA off the bottom of a short but wide window. */
+@media (max-height: 780px) and (min-width: 861px) {
+  #homeScreen { grid-template-rows: minmax(12px, .6fr) auto minmax(16px, .85fr); }
+  .intro { gap: clamp(18px, 3vh, 28px); }
+  .hero-title { font-size: clamp(52px, 7.2vh, 78px); }
+  .intro-lead { margin-top: clamp(14px, 2vh, 20px); }
+  .intro-story { margin-top: 10px; line-height: 1.55; }
+}
+@media (max-height: 660px) and (min-width: 861px) {
+  .intro-story { display: none; }
+}
+
 /* ---- Mobile ---- */
 @media (max-width: 860px) {
   body { overflow-y: auto; }
   .viewport { min-height: 100dvh; }
   .scene-layer { background-position: var(--scene-position-mobile); }
 
-  #homeScreen { align-items: flex-start; }
-  .intro { max-width: 100%; padding-top: 6vh; }
-  #homeTitle { font-size: clamp(42px, 13vw, 62px); }
+  #homeScreen { grid-template-rows: minmax(8px, .5fr) auto minmax(16px, .9fr); align-items: start; }
+  .intro { max-width: 100%; }
+  .hero-title { font-size: clamp(48px, 13vw, 64px); max-inline-size: 8ch; }
   .intro-actions { flex-direction: column; align-items: stretch; }
   .intro-actions .btn { width: 100%; }
 
@@ -36,6 +51,14 @@
 
   .channel-row { grid-template-columns: 1fr; }
   .scene-card .result-art { aspect-ratio: 4 / 3; }
+}
+
+/* ---- Short mobile viewports (e.g. 430x700 in a browser chrome / embed) ---- */
+@media (max-width: 860px) and (max-height: 700px) {
+  .intro { gap: clamp(14px, 2.4vh, 20px); }
+  .intro-story { display: none; }
+  .hero-title { font-size: clamp(42px, 11vw, 56px); }
+  .scene-particles { opacity: .5; }
 }
 
 /* ---- Narrow phones ---- */

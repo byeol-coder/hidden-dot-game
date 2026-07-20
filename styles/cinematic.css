@@ -48,32 +48,60 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 /* ============================================================
    INTRO — title screen
    ============================================================ */
-#homeScreen { align-items: center; }
-.intro {
-  max-width: min(640px, 92%);
-  padding: clamp(8px, 3vh, 40px) 0;
+/* Three zones stacked with unequal weight: the title/mission group
+   sits slightly above true center, the CTA/meta group is anchored
+   lower — not one long centered column. */
+#homeScreen {
+  display: grid;
+  grid-template-rows: minmax(16px, .72fr) auto minmax(24px, 1fr);
+  align-items: start;
 }
+.intro {
+  grid-row: 2;
+  max-width: min(640px, 92%);
+  display: grid;
+  gap: clamp(28px, 4.4vh, 44px); /* copy group <-> actions group */
+}
+.hero-copy { display: grid; }
 .eyebrow {
-  color: var(--game-cyan); font-size: clamp(12px, 1.4vw, 14px); letter-spacing: .18em;
-  font-weight: 900; text-transform: uppercase; margin-bottom: 14px;
+  font-family: var(--font-interface);
+  color: var(--game-cyan); font-size: var(--text-caption); letter-spacing: var(--tracking-label);
+  font-weight: 800; text-transform: uppercase; margin: 0 0 clamp(14px, 1.8vh, 20px);
   text-shadow: 0 2px 10px rgba(0,0,0,.7);
 }
-#homeTitle {
-  font-size: clamp(46px, 9vw, 92px); line-height: .95; letter-spacing: -.06em; margin: 0 0 20px;
-  text-shadow: 0 6px 34px rgba(0,0,0,.72), 0 2px 8px rgba(0,0,0,.6);
+.hero-title {
+  max-inline-size: 7.5ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-display-xl);
+  font-weight: 830;
+  font-stretch: 100%;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+  color: var(--game-text);
+  text-shadow: 0 3px 22px rgba(0,0,0,.68), 0 1px 3px rgba(0,0,0,.6);
   animation: introFade .9s ease both;
 }
+.hero-title__line { display: block; }
+.hero-title__line--accent { color: var(--game-gold); }
 .intro-lead {
-  font-size: clamp(18px, 2.6vw, 26px); line-height: 1.5; font-weight: 750; color: #eef7ff;
-  max-width: 30ch; text-shadow: 0 2px 14px rgba(0,0,0,.7);
+  font-family: var(--font-reading);
+  font-size: clamp(22px, 2vw, 30px); line-height: 1.42; font-weight: 720; color: #eef7ff;
+  letter-spacing: -.025em; max-width: 23ch; text-wrap: balance;
+  margin: clamp(20px, 2.6vh, 32px) 0 0;
+  text-shadow: 0 2px 14px rgba(0,0,0,.7);
   animation: introFade 1s ease .1s both;
 }
 .intro-story {
-  color: #d6e6f8; font-size: 15.5px; line-height: 1.75; max-width: 46ch; margin-top: 14px;
+  font-family: var(--font-reading);
+  color: var(--game-text-secondary); font-size: clamp(15px, 1.1vw, 17px); font-weight: 450;
+  line-height: 1.7; max-width: 42ch; margin: clamp(14px, 1.8vh, 20px) 0 0;
   text-shadow: 0 1px 10px rgba(0,0,0,.7);
   animation: introFade 1s ease .2s both;
 }
-.intro-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 30px 0 18px; animation: introFade 1s ease .3s both; }
+.hero-actions { display: grid; gap: clamp(14px, 1.8vh, 18px); animation: introFade 1s ease .3s both; }
+.intro-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .btn.primary.xl { position: relative; }
 .btn.primary.xl::after {
   content: ""; position: absolute; inset: -3px; border-radius: 20px; pointer-events: none;
@@ -83,8 +111,15 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
   0%,100% { box-shadow: 0 0 20px 2px rgba(255,214,106,.32); }
   50% { box-shadow: 0 0 34px 8px rgba(255,214,106,.5); }
 }
-.intro-meta { color: var(--game-text-muted); font-size: 13.5px; letter-spacing: .01em; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
-@keyframes introFade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.intro-meta {
+  font-family: var(--font-interface);
+  color: var(--game-text-tertiary); font-size: var(--text-caption); font-weight: 550;
+  letter-spacing: .01em; text-shadow: 0 1px 8px rgba(0,0,0,.7);
+}
+@keyframes introFade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .eyebrow { animation: introFade .6s ease both; }
+}
 
 /* ============================================================
    PLAY — stage scene
@@ -107,9 +142,26 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
   border-inline-start: 3px solid var(--accent);
   backdrop-filter: blur(8px);
 }
-.stage-kicker { color: var(--accent); font-weight: 900; font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 4px; }
-.stage-title { font-size: clamp(22px, 3.2vw, 34px); letter-spacing: -.04em; margin: 0 0 5px; text-shadow: 0 2px 14px rgba(0,0,0,.5); }
-.stage-desc { color: var(--game-text-muted); line-height: 1.5; margin: 0; font-size: clamp(13.5px, 1.5vw, 15.5px); max-width: 60ch; }
+/* Hierarchy is deliberately: kicker (label) < stage name < current
+   objective. The objective is what the player needs right now, so it
+   reads stronger than the stage name — not the game title repeated. */
+.stage-kicker {
+  font-family: var(--font-interface);
+  color: var(--accent); font-weight: 800; font-size: 13px; letter-spacing: .12em;
+  text-transform: uppercase; margin: 0 0 4px;
+}
+.stage-title {
+  font-family: var(--font-interface);
+  font-size: clamp(18px, 1.8vw, 24px); font-weight: 750; letter-spacing: -.02em;
+  margin: 0 0 7px; color: var(--game-text-secondary);
+  text-shadow: 0 2px 14px rgba(0,0,0,.5);
+}
+.stage-desc {
+  font-family: var(--font-display);
+  color: var(--game-text); line-height: 1.35; margin: 0; max-width: 42ch;
+  font-size: clamp(20px, 2.2vw, 30px); font-weight: 780; letter-spacing: -.025em;
+  text-wrap: balance;
+}
 
 /* Light slots (progress) */
 .lights { display: flex; gap: 8px; flex-shrink: 0; }
@@ -257,7 +309,11 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 }
 .dotty-avatar::before { left: 32%; }
 .dotty-avatar::after { right: 32%; }
-.status-message { margin: 0; color: #f6fbff; line-height: 1.5; font-weight: 700; font-size: clamp(14px, 1.7vw, 16px); }
+.status-message {
+  font-family: var(--font-interface);
+  margin: 0; color: #f6fbff; line-height: 1.5; font-weight: 700; font-size: clamp(14px, 1.7vw, 16px);
+  min-height: calc(1.5em * 2); display: flex; align-items: center;
+}
 .status-message.success { color: #fff2ad; }
 .status-message.error { color: #ffd7d7; }
 /* success/error also carry an icon marker so state is not colour-only */
@@ -293,9 +349,23 @@ dialog {
 dialog::backdrop { background: rgba(2, 7, 16, .74); backdrop-filter: blur(6px); }
 .dialog-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
 .dialog-step { color: var(--game-cyan); font-size: 12.5px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 8px; }
-.dialog-title { font-size: clamp(24px, 4vw, 38px); letter-spacing: -.04em; margin: 0 0 10px; }
+.dialog-title {
+  font-family: var(--font-interface);
+  font-size: clamp(24px, 4vw, 38px); font-weight: 800; letter-spacing: -.04em; margin: 0 0 10px;
+}
 .dialog-title.sm { font-size: clamp(19px, 2.6vw, 24px); margin: 0; }
 .dialog-desc { color: #e7f1ff; line-height: 1.65; font-size: 15.5px; margin: 0; }
+/* Result scenes (stage-clear / ending): the emotional payoff line is
+   the strongest text on screen, stronger than any dialog elsewhere. */
+.scene-card-body .dialog-title {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 4.6vw, 56px); font-weight: 850; line-height: 1.04; letter-spacing: -.04em;
+  text-wrap: balance;
+}
+.scene-card-body .dialog-desc {
+  font-family: var(--font-reading);
+  font-size: clamp(17px, 1.6vw, 21px); font-weight: 620; line-height: 1.5;
+}
 .dialog-hint { color: var(--game-text-muted); font-size: 13.5px; line-height: 1.6; margin: 0 0 14px; }
 .dialog-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .dialog-actions-right { display: flex; gap: 9px; flex-wrap: wrap; }
