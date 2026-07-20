@@ -476,11 +476,17 @@ dialog::backdrop { background: rgba(2, 7, 16, .74); backdrop-filter: blur(6px); 
   display: block; border: 0;
 }
 .scene-card-body { padding: clamp(20px, 4vw, 32px); position: relative; margin-top: -46px; }
+/* Photo-to-panel blend: the old scrim ended short of the image/body seam,
+   so the kicker label sat on a visible hard edge between raw photo and flat
+   panel colour. This one runs the full overlap (and a bit further up into
+   the photo for a longer, gentler fade) and lands on the exact colour the
+   panel itself uses, so there is no seam left to see. */
 .scene-card-body::before {
-  content: ""; position: absolute; left: 0; right: 0; top: -60px; height: 90px; pointer-events: none;
-  background: linear-gradient(180deg, transparent, #0b2038 92%);
+  content: ""; position: absolute; left: 0; right: 0; top: -128px; height: 128px; pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgba(8,16,31,.6) 46%, #08182f 84%, #08182f 100%);
 }
 .scene-card-body > * { position: relative; }
+.scene-card-body .dialog-step { text-shadow: 0 2px 10px rgba(0,0,0,.7); }
 /* Progress lights and the "what's next" line read as one small cluster,
    set apart from the title/description above and the buttons below by
    unequal spacing rather than one repeated margin. */
