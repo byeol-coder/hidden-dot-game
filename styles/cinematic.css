@@ -172,6 +172,21 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
   text-wrap: balance;
 }
 
+/* Mission-side cluster: progress + the two utility drawers (help / tactile
+   preview), grouped together on one side instead of the utility buttons
+   living in their own separate row at the bottom of the screen. */
+.mission-side { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.mission-tools { display: flex; gap: 8px; }
+.icon-btn {
+  width: 40px; height: 40px; flex: 0 0 auto; border-radius: 12px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.07); border: 1px solid var(--game-border); color: var(--game-text);
+  transition: background .14s ease, border-color .14s ease, transform .14s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.icon-btn:hover { background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.4); transform: translateY(-1px); }
+.icon-btn .ico { width: 19px; height: 19px; }
+
 /* Journey progress */
 .progress-cluster { display: flex; align-items: center; flex-shrink: 0; }
 .journey-progress {
@@ -225,12 +240,12 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 10px;
 }
+/* Plain caption, not its own pill/card — reads as a label on the board
+   below it rather than one more floating panel competing for attention. */
 .instruction {
   flex: 0 0 auto; text-align: center; max-width: 60ch; margin: 0;
   color: #eafcff; font-weight: 700; font-size: clamp(13px, 1.5vw, 15px); line-height: 1.5;
-  padding: 9px 16px; border-radius: 999px;
-  background: rgba(9, 32, 52, .55); border: 1px solid var(--accent-soft);
-  text-shadow: 0 1px 6px rgba(0,0,0,.5);
+  text-shadow: 0 2px 10px rgba(0,0,0,.7);
 }
 
 /* Board — "starlight search altar" */
@@ -252,7 +267,13 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
   box-shadow: inset 0 0 0 1px rgba(180,215,255,.12);
 }
 .search-board {
-  width: min(600px, 100%); height: 100%; max-height: 100%;
+  /* Square cells regardless of stage shape: fix the board's own aspect
+     ratio to cols:rows (set as --board-ratio in renderBoard()). Height is
+     the definite dimension (100% of board-shell's grid cell); width is
+     derived from the ratio and capped so a wide board never overflows. */
+  height: 100%; width: auto;
+  aspect-ratio: var(--board-ratio, 1);
+  max-width: min(600px, 100%);
   display: grid;
   gap: clamp(8px, 2.2vw, 34px);
   place-items: center;
@@ -337,16 +358,20 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 
 .board-help { flex: 0 0 auto; margin: 0; color: var(--game-text-muted); font-size: 12.5px; text-align: center; line-height: 1.5; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
 
-/* Dotty companion ribbon (status) */
-.dotty-ribbon {
+/* Control panel: companion status and the primary action buttons share
+   one card instead of stacking as two separate floating panels. */
+.control-panel {
   flex: 0 0 auto;
-  display: flex; align-items: center; gap: 13px;
-  padding: 12px 18px; border-radius: 16px;
-  background: linear-gradient(90deg, rgba(10,30,54,.78), rgba(8,22,44,.55));
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 14px 18px 16px; border-radius: 18px;
+  background: linear-gradient(180deg, rgba(11,31,56,.78), rgba(8,20,42,.6));
   border: 1px solid rgba(150,210,255,.24);
   backdrop-filter: blur(8px);
   box-shadow: var(--game-shadow-control);
 }
+
+/* Dotty companion status row */
+.dotty-ribbon { flex: 0 0 auto; display: flex; align-items: center; gap: 13px; }
 .dotty-avatar {
   width: 42px; height: 42px; flex: 0 0 auto; border-radius: 50%;
   background:
@@ -377,8 +402,6 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 }
 .action-bar .btn.act { flex-direction: row; min-height: 54px; padding: 10px 14px; }
 .action-bar .btn.act .btn-key { margin-inline-start: auto; }
-
-.drawer-triggers { flex: 0 0 auto; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
 /* ============================================================
    Per-stage accents + scene focus

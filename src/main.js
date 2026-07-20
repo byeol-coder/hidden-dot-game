@@ -314,6 +314,12 @@ import { ACTION } from "./input/actions.js";
     const board = $("#searchBoard");
     board.style.gridTemplateColumns = `repeat(${stage.cols}, minmax(0, 1fr))`;
     board.style.gridTemplateRows = `repeat(${stage.rows}, minmax(0, 1fr))`;
+    // Lock the board's own aspect ratio to cols:rows so cells are always
+    // square, regardless of how much width vs. height board-shell happens
+    // to have available (previously the board just stretched to fill a
+    // non-square box, so stones on a 2x2 stage could render as squat
+    // rectangles instead of even tiles).
+    board.style.setProperty("--board-ratio", `${stage.cols} / ${stage.rows}`);
     board.innerHTML = "";
     const total = stage.cols * stage.rows;
     let rowWrap = null;

@@ -43,7 +43,7 @@
   .intro-actions .btn { width: 100%; }
 
   .mission { flex-direction: column; gap: 12px; }
-  .journey-progress { align-self: flex-start; }
+  .mission-side { align-self: flex-start; flex-wrap: wrap; }
 
   .action-bar { grid-template-columns: 1fr 1fr; }
   .action-bar .btn.act { flex-direction: column; gap: 5px; min-height: 66px; text-align: center; }
@@ -110,14 +110,14 @@
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .mission, .dotty-ribbon, .instruction, .sys-btn, .mini-btn,
+  .mission, .control-panel, .sys-btn, .icon-btn, .mini-btn,
   .panel-dialog .dialog-body, .briefing, .scene-card, .btn.secondary {
     backdrop-filter: none !important;
   }
   .mission { background: var(--game-surface-strong); }
-  .dotty-ribbon { background: var(--game-surface-strong); }
-  .instruction { background: #0a2038; }
+  .control-panel { background: var(--game-surface-strong); }
   .sys-btn { background: #0a1c38; }
+  .icon-btn { background: #0a1c38; }
   .mini-btn { background: #0a1c38; }
   .scene::after { background: rgba(4,9,20,.8); }
 }
@@ -137,8 +137,8 @@
    Windows High Contrast / forced-colors
    ============================================================ */
 @media (forced-colors: active) {
-  .btn, .sys-btn, .mini-btn, .spot::before, .mission, .dotty-ribbon,
-  .instruction, .panel-dialog .dialog-body, .briefing, .scene-card {
+  .btn, .sys-btn, .mini-btn, .icon-btn, .spot::before, .mission, .control-panel,
+  .panel-dialog .dialog-body, .briefing, .scene-card {
     forced-color-adjust: none;
     border: 1px solid CanvasText;
     background: Canvas;
