@@ -151,9 +151,12 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
   border-inline-start: 3px solid var(--accent);
   backdrop-filter: blur(8px);
 }
-/* Hierarchy is deliberately: kicker (label) < stage name < current
-   objective. The objective is what the player needs right now, so it
-   reads stronger than the stage name — not the game title repeated. */
+/* Hierarchy, rebalanced: the board is the actual thing being played and
+   should read as the largest element on screen. The mission bar is
+   orientation, not content, so within it: kicker (smallest) < objective
+   caption < stage name (the one thing worth a glance, "where am I").
+   The objective line already repeats near-verbatim in Dotty's status
+   message below, so it no longer needs to compete at headline size. */
 .stage-kicker {
   font-family: var(--font-interface);
   color: var(--accent); font-weight: 800; font-size: 13px; letter-spacing: .12em;
@@ -161,15 +164,14 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 }
 .stage-title {
   font-family: var(--font-interface);
-  font-size: clamp(18px, 1.8vw, 24px); font-weight: 750; letter-spacing: -.02em;
-  margin: 0 0 7px; color: var(--game-text-secondary);
+  font-size: clamp(20px, 2vw, 27px); font-weight: 820; letter-spacing: -.02em;
+  margin: 0 0 6px; color: var(--game-text);
   text-shadow: 0 2px 14px rgba(0,0,0,.5);
 }
 .stage-desc {
-  font-family: var(--font-display);
-  color: var(--game-text); line-height: 1.35; margin: 0; max-width: 42ch;
-  font-size: clamp(20px, 2.2vw, 30px); font-weight: 780; letter-spacing: -.025em;
-  text-wrap: balance;
+  font-family: var(--font-interface);
+  color: var(--game-text-muted); line-height: 1.4; margin: 0; max-width: 42ch;
+  font-size: clamp(13px, 1.1vw, 15px); font-weight: 500; letter-spacing: -.005em;
 }
 
 /* Mission-side cluster: progress + the two utility drawers (help / tactile
@@ -250,8 +252,11 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 
 /* Board — "starlight search altar" */
 .board-shell {
+  /* The board is the actual game — it should read as the largest,
+     heaviest element on the play screen, not a middling middle panel
+     between two chrome bars. */
   flex: 1 1 auto; min-height: 0;
-  position: relative; width: min(760px, 100%);
+  position: relative; width: min(900px, 100%);
   display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); place-items: center;
   padding: clamp(14px, 2.4vw, 30px);
   border-radius: var(--game-radius-scene);
@@ -273,7 +278,7 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
      derived from the ratio and capped so a wide board never overflows. */
   height: 100%; width: auto;
   aspect-ratio: var(--board-ratio, 1);
-  max-width: min(600px, 100%);
+  max-width: min(720px, 100%);
   display: grid;
   gap: clamp(8px, 2.2vw, 34px);
   place-items: center;
@@ -289,7 +294,7 @@ main { position: relative; z-index: 1; flex: 1 1 auto; display: flex; min-height
 /* Individual stone / spot — fills its grid cell so boards with more
    rows/columns shrink to fit instead of overflowing the shell. */
 .spot {
-  width: 100%; height: 100%; max-width: 88px; max-height: 88px;
+  width: 100%; height: 100%; max-width: 132px; max-height: 132px;
   border: 0; background: none; padding: 0; position: relative;
   display: grid; place-items: center; cursor: pointer; border-radius: 26%;
   transition: transform .18s ease;

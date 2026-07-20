@@ -4,9 +4,10 @@
 
 /* ---- Desktop: keep the play area within one viewport ---- */
 @media (min-width: 861px) {
-  .stage { max-width: 1120px; margin: 0 auto; }
-  /* cap board width so a landscape desktop keeps board + controls in one view */
-  .board-shell { width: min(760px, 82vh); }
+  .stage { max-width: 1220px; margin: 0 auto; }
+  /* cap board width so a landscape desktop keeps board + controls in one view,
+     while still letting the board be the largest element on screen */
+  .board-shell { width: min(900px, 84vh); }
 }
 
 /* ---- Tablet / small laptop ---- */
