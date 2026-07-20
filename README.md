@@ -125,9 +125,11 @@ SDK가 없거나 브라우저가 Web Bluetooth를 지원하지 않으면 화면 
 ## 프로젝트 구조
 
 ```text
-index.html            # 랜딩 + 게임 셸
+index.html            # 타이틀 화면 + 게임 셸 (풀블리드 시네마틱 구조)
 tts.js                # 단독 배포용 TW_TTS 호환 음성 모듈
-styles/game.css
+styles/game.css       # 디자인 토큰 · 리셋 · 버튼 시스템
+styles/cinematic.css  # 씬 배경 · HUD · 보드 · 다이얼로그 레이아웃
+styles/responsive.css # 반응형 · embed · 모션/명암 설정
 src/main.js           # 게임 상태 + 렌더링
 src/platform/         # runtime · hostBridge · ttsAdapter
 src/tactile/frame.js  # 60×40 프레임 생성 + 2×4셀 hex 인코딩
