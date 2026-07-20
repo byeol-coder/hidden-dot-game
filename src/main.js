@@ -754,6 +754,35 @@ import { ACTION } from "./input/actions.js";
     if (closeBtn) closeBtn.click();
   }
 
+  // ---- DotPad navigation on the home (title) screen ------------------------
+  // The title screen is the very first thing a DotPad-only player reaches —
+  // before this, handleDotPadKey fell straight through to the game-board
+  // switch below, whose handlers all early-return while state.screen !== "game".
+  // That meant "바로 시작"/"처음부터 배우기"/sound/connect were unreachable
+  // without a keyboard. This mirrors the dialog navigation above, scoped to
+  // whatever is currently visible in the header + title screen.
+  function homeFocusables() {
+    return [...document.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+      .filter(el => !el.disabled && !el.closest("dialog") && el.getClientRects().length > 0);
+  }
+  function moveHomeFocus(dir) {
+    const items = homeFocusables();
+    if (!items.length) return;
+    const cur = items.indexOf(document.activeElement);
+    const next = cur === -1 ? (dir > 0 ? 0 : items.length - 1) : (cur + dir + items.length) % items.length;
+    items[next].focus();
+    const label = dialogControlLabel(items[next]);
+    if (label) speak(label);
+  }
+  function activateHomeFocus() {
+    const el = document.activeElement;
+    if (homeFocusables().includes(el) && typeof el.click === "function") el.click();
+  }
+  function readHomeAloud() {
+    const message = [$("#homeTitle")?.textContent, $("#homeLead")?.textContent].filter(Boolean).join(". ").trim();
+    if (message) speak(message);
+  }
+
   function handleDotPadKey(keyCode) {
     const K = state.keyCodes;
     if (!K) return;
@@ -771,6 +800,21 @@ import { ACTION } from "./input/actions.js";
         }
         case K.PanningAll: readDialogAloud(dialog); break;
         case K.LPF1: closeTopDialog(dialog); break;
+      }
+      return;
+    }
+    if (state.screen === "home") {
+      switch (keyCode) {
+        case K.PanningLeft: case K.KeyFunction1: moveHomeFocus(-1); break;
+        case K.PanningRight: case K.KeyFunction2: moveHomeFocus(1); break;
+        case K.KeyFunction3: activateHomeFocus(); break;
+        case K.KeyFunction4: {
+          const el = document.activeElement;
+          const label = homeFocusables().includes(el) ? dialogControlLabel(el) : "";
+          if (label) speak(label); else readHomeAloud();
+          break;
+        }
+        case K.PanningAll: readHomeAloud(); break;
       }
       return;
     }
