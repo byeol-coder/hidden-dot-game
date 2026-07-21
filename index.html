@@ -99,6 +99,37 @@
     padding:1px 6px; font-size:11.5px; font-weight:700; }
   .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
   @media (prefers-reduced-motion: reduce){ *{ transition:none!important; } }
+
+  /* ===== 좁은 화면(모바일 세로) 최적화 ===== */
+  @media (max-width:480px){
+    .wrap{ padding:12px 12px 28px; }
+    header.hd{ gap:10px; margin-bottom:10px; }
+    h1{ font-size:18px; }
+    .hud{ gap:7px; margin:10px 0; }
+    .stat{ padding:8px 10px; border-radius:12px; }
+    .stat .lbl{ font-size:10.5px; }
+    .stat .val{ font-size:18px; }
+    .stat .val i{ font-size:15px; }
+    .statusbar{ font-size:12.5px; padding:9px 11px; margin-bottom:10px; }
+    /* 셀을 정사각에 가깝게 키워 세로 터치 영역 확보 */
+    .cell{ aspect-ratio:1/1; font-size:16px; border-radius:6px; }
+    #board{ gap:4px; }
+    #colLabels{ gap:4px; }
+    #rowLabels{ min-width:12px; }
+    #colLabels span, #rowLabels span{ font-size:10px; }
+    .boardwrap{ gap:4px; }
+    body.bg-on .boardwrap{ padding:8px; border-radius:12px; }
+    /* 컨트롤: 아이콘 버튼까지 2열 그리드로 정돈 */
+    .controls{ display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    .controls .btn, .controls select{ min-height:46px; width:auto; }
+    .btn.primary{ flex:none; }
+    .help{ font-size:12px; padding:10px 12px; line-height:1.6; }
+  }
+  @media (max-width:360px){
+    .cell{ font-size:15px; }
+    .stat .val{ font-size:16px; }
+    .hud .stat:nth-child(3){ display:none; }   /* 초협폭: 진행 카드 숨겨 남은지뢰·시간 확보(정보는 음성/현황키로 제공) */
+  }
   /* ===== 플레이 배경(광산 씬) — 접근성: 강한 스크림 + 어두운 유리 패널로 대비 유지, 토글 가능 ===== */
   body.bg-on{ --bg:#140f0a; --panel:#1e1712; --ink:#F3ECE2; --ink-soft:#E0D2BC; --line:#3A2F24;
     --dot-orange:#FF7A1A; --dot-orange-soft:#FF9440; --pin-up:#F3B24B; --pin-down:#3A3128; }
